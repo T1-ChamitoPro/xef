@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../services/auth_service.dart';
+import '../../core/widgets/custom_text_field.dart';
+import '../../providers/auth_provider.dart';
+import 'widgets/gender_selector.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -19,10 +22,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _pesoController = TextEditingController();
 
   String _sexoSeleccionado = 'Masculino';
-  final List<String> _opcionesSexo = ['Masculino', 'Femenino', 'Otro'];
 
-  final _authService = AuthService();
-  bool _isLoading = false;
+  @override
+  void dispose() {
+    _nombreController.dispose();
+    _apellidoController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _alturaController.dispose();
+    _pesoController.dispose();
+    super.dispose();
+  }
 
   Future<void> _handleRegister() async {
     final nombre = _nombreController.text.trim();
@@ -56,39 +66,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    setState(() => _isLoading = true);
+    final authProvider = context.read<AuthProvider>();
+    final success = await authProvider.registrarUsuario(
+      email: email,
+      password: password,
+      nombre: nombre,
+      apellido: apellido,
+      alturaCm: alturaCm,
+      pesoKg: pesoKg,
+      sexo: _sexoSeleccionado,
+    );
 
-    try {
-      await _authService.registrarUsuario(
-        email: email,
-        password: password,
-        nombre: nombre,
-        apellido: apellido,
-        alturaCm: alturaCm,
-        pesoKg: pesoKg,
-        sexo: _sexoSeleccionado,
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Registro exitoso! Iniciando sesión...'),
+        ),
       );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('¡Registro exitoso! Iniciando sesión...'),
-          ),
-        );
-        Navigator.of(context).pop(); // Regresa al Login / AuthGate
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error en el registro: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      Navigator.of(context).pop();
+    } else if (!success && mounted && authProvider.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error en el registro: ${authProvider.errorMessage}'),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.watch<AuthProvider>().isLoading;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -97,7 +105,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_new,
-            color: AppColors.accentGreen,
+            color: AppColors.lightGreen,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -125,166 +133,76 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 30),
 
-              // Campo: Nombre y Apellido
+              // Nombre y Apellido
               Row(
                 children: [
                   Expanded(
-                    child: TextField(
+                    child: CustomTextField(
                       controller: _nombreController,
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      decoration: const InputDecoration(
-                        hintText: 'Nombre',
-                        prefixIcon: Icon(
-                          Icons.person_outline,
-                          color: AppColors.accentGreen,
-                        ),
-                      ),
+                      hintText: 'Nombre',
+                      prefixIcon: Icons.person_outline,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: TextField(
+                    child: CustomTextField(
                       controller: _apellidoController,
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      decoration: const InputDecoration(
-                        hintText: 'Apellido',
-                        prefixIcon: Icon(
-                          Icons.person_outline,
-                          color: AppColors.accentGreen,
-                        ),
-                      ),
+                      hintText: 'Apellido',
+                      prefixIcon: Icons.person_outline,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
 
-              // Campo: Email
-              TextField(
+              // Email
+              CustomTextField(
                 controller: _emailController,
+                hintText: 'Correo electrónico',
+                prefixIcon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(color: AppColors.textPrimary),
-                decoration: const InputDecoration(
-                  hintText: 'Correo electrónico',
-                  prefixIcon: Icon(
-                    Icons.email_outlined,
-                    color: AppColors.accentGreen,
-                  ),
-                ),
               ),
               const SizedBox(height: 16),
 
-              // Campo: Contraseña
-              TextField(
+              // Contraseña
+              CustomTextField(
                 controller: _passwordController,
+                hintText: 'Contraseña',
+                prefixIcon: Icons.lock_outline,
                 obscureText: true,
-                style: const TextStyle(color: AppColors.textPrimary),
-                decoration: const InputDecoration(
-                  hintText: 'Contraseña',
-                  prefixIcon: Icon(
-                    Icons.lock_outline,
-                    color: AppColors.accentGreen,
-                  ),
-                ),
               ),
               const SizedBox(height: 16),
 
-              // Campos Métricos: Altura y Peso
+              // Altura y Peso
               Row(
                 children: [
                   Expanded(
-                    child: TextField(
+                    child: CustomTextField(
                       controller: _alturaController,
+                      hintText: 'Altura (cm)',
+                      prefixIcon: Icons.height,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      decoration: const InputDecoration(
-                        hintText: 'Altura (cm)',
-                        prefixIcon: Icon(
-                          Icons.height,
-                          color: AppColors.accentGreen,
-                        ),
-                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: TextField(
+                    child: CustomTextField(
                       controller: _pesoController,
+                      hintText: 'Peso (kg)',
+                      prefixIcon: Icons.scale_outlined,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      style: const TextStyle(color: AppColors.textPrimary),
-                      decoration: const InputDecoration(
-                        hintText: 'Peso (kg)',
-                        prefixIcon: Icon(
-                          Icons.scale_outlined,
-                          color: AppColors.accentGreen,
-                        ),
-                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
 
-              // Selector de Sexo Biológico (para el cálculo de métricas e IMC)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.cardBg,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.accentGreen.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.wc, color: AppColors.accentGreen),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Sexo:',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: _sexoSeleccionado,
-                          dropdownColor: AppColors.cardBg,
-                          icon: const Icon(
-                            Icons.arrow_drop_down,
-                            color: AppColors.accentGreen,
-                          ),
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() => _sexoSeleccionado = newValue);
-                            }
-                          },
-                          items: _opcionesSexo.map<DropdownMenuItem<String>>((
-                            String value,
-                          ) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              // Selector de Sexo Biológico
+              GenderSelector(
+                selectedValue: _sexoSeleccionado,
+                onChanged: (val) => setState(() => _sexoSeleccionado = val),
               ),
               const SizedBox(height: 35),
 
@@ -293,10 +211,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleRegister,
-                  child: _isLoading
+                  onPressed: isLoading ? null : _handleRegister,
+                  child: isLoading
                       ? const CircularProgressIndicator(
-                          color: AppColors.accentGreen,
+                          color: AppColors.lightGreen,
                         )
                       : const Text('REGISTRARME'),
                 ),

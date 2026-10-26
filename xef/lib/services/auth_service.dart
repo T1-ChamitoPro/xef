@@ -1,9 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/user_profile.dart';
 
+/// Servicio de autenticación y gestión de perfil en Supabase
 class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  // Registrar Usuario en Auth y guardar perfil en la tabla 'usuario'
+  /// Registra usuario en Supabase Auth y guarda sus datos antropométricos en la tabla 'usuario'
   Future<void> registrarUsuario({
     required String email,
     required String password,
@@ -13,17 +15,16 @@ class AuthService {
     required double pesoKg,
     required String sexo,
   }) async {
-    // 1. Crear usuario en Supabase Auth
     final response = await _supabase.auth.signUp(
       email: email,
       password: password,
     );
 
     final userId = response.user?.id;
-    if (userId == null)
+    if (userId == null) {
       throw Exception('Error al registrar usuario en Supabase Auth');
+    }
 
-    // Mapeo del string del selector al enum exacto de la BD ('MASCULINO', 'FEMENINO', 'OTRO')
     String sexoEnum;
     switch (sexo.trim().toLowerCase()) {
       case 'hombre':
@@ -38,7 +39,6 @@ class AuthService {
         sexoEnum = 'OTRO';
     }
 
-    // 2. Insertar perfil físico en la tabla 'usuario'
     await _supabase.from('usuario').insert({
       'id': userId,
       'nombre': nombre,
@@ -50,13 +50,13 @@ class AuthService {
     });
   }
 
-  // Iniciar Sesión
+  /// Inicia sesión con correo y contraseña
   Future<void> login(String email, String password) async {
     await _supabase.auth.signInWithPassword(email: email, password: password);
   }
 
-  // Obtener Perfil del Usuario Actual
-  Future<Map<String, dynamic>?> obtenerPerfil() async {
+  /// Obtiene el perfil del usuario autenticado mapeado a UserProfile
+  Future<UserProfile?> obtenerPerfilUsuario() async {
     final userId = _supabase.auth.currentUser?.id;
     if (userId == null) return null;
 
@@ -66,10 +66,11 @@ class AuthService {
         .eq('id', userId)
         .maybeSingle();
 
-    return data;
+    if (data == null) return null;
+    return UserProfile.fromMap(data);
   }
 
-  // Cerrar Sesión
+  /// Cierra la sesión activa
   Future<void> logout() async {
     await _supabase.auth.signOut();
   }

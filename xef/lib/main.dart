@@ -1,16 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/theme/app_theme.dart';
 import 'features/auth/login_screen.dart';
 import 'features/home/main_wrapper.dart';
+import 'providers/auth_provider.dart';
+import 'providers/diet_provider.dart';
+import 'providers/recipe_provider.dart';
+import 'providers/routine_provider.dart';
+import 'providers/historial_provider.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
     url: 'https://tlfrqdcablbptyanryvj.supabase.co',
     anonKey: 'sb_publishable_aIM05XQrCDnYkeJ726pgoQ_I2MUR-fQ',
   );
-  runApp(const XefApp());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => DietProvider()),
+        ChangeNotifierProvider(create: (_) => RoutineProvider()),
+        ChangeNotifierProvider(create: (_) => RecipeProvider()),
+        ChangeNotifierProvider(
+          create: (_) => HistorialProvider()..cargarHistorialHoy(),
+        ),
+      ],
+      child: const XefApp(),
+    ),
+  );
 }
 
 class XefApp extends StatelessWidget {
@@ -37,9 +58,9 @@ class AuthGate extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Color(0xFF000F4F),
+            backgroundColor: AppColors.background,
             body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF00FF19)),
+              child: CircularProgressIndicator(color: AppColors.lightGreen),
             ),
           );
         }

@@ -1,152 +1,252 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../core/theme/app_theme.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/background_glow.dart';
+import '../../../models/recipe_model.dart';
+import '../../../providers/recipe_provider.dart';
+import 'widgets/recipe_ingredients_section.dart';
+import 'widgets/recipe_steps_section.dart';
 
 class RecipeDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> recetaData;
+  final RecipeModel receta;
 
-  const RecipeDetailScreen({super.key, required this.recetaData});
+  const RecipeDetailScreen({super.key, required this.receta});
 
   @override
   Widget build(BuildContext context) {
-    final nombre = recetaData['nombre'] ?? 'RECETA';
-    final infoNutricional =
-        recetaData['info_nutricional'] as Map<String, dynamic>? ?? {};
-    final ingredientes = recetaData['ingredientes'] as List<dynamic>? ?? [];
-    final pasos = List<String>.from(recetaData['pasos'] ?? []);
+    final double bottomPadding = MediaQuery.of(context).padding.bottom + 100.0;
+
+    // Extracción de datos nutricionales con fallback seguro
+    final Map<String, dynamic>? info = receta.infoNutricional;
+    final int calorias = (info?['calorias'] as num?)?.toInt() ?? 0;
+    final double proteinas = (info?['proteinas_g'] as num?)?.toDouble() ?? 0.0;
+    final double carbos = (info?['carbohidratos_g'] as num?)?.toDouble() ?? 0.0;
+    final double grasas = (info?['grasas_g'] as num?)?.toDouble() ?? 0.0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Botón Atrás
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryDark,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: AppColors.accentGreen,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
+      appBar: AppBar(
+        title: Text(
+          receta.nombre,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          Consumer<RecipeProvider>(
+            builder: (context, recipeProvider, _) {
+              final esFav = recipeProvider.esFavorita(receta.nombre);
 
-              // Nombre de la Receta
-              Text(
-                nombre.toString().toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Tarjeta de Información Nutricional
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.cardBg,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'INFORMACIÓN NUTRICIONAL:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryDark,
+              return IconButton(
+                onPressed: () async {
+                  await recipeProvider.toggleFavorita(receta);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          esFav
+                              ? 'Receta eliminada de guardadas'
+                              : '¡Receta guardada en la base de datos!',
+                        ),
+                        backgroundColor: AppColors.lightGreen,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      infoNutricional['resumen'] ?? 'Aporta los macronutrientes necesarios para una dieta equilibrada.',
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ],
+                    );
+                  }
+                },
+                icon: Icon(
+                  esFav
+                      ? Icons.favorite_rounded
+                      : Icons.favorite_border_rounded,
+                  color: esFav ? Colors.redAccent : AppColors.textSecondary,
                 ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: Stack(
+        children: [
+          const BackgroundGlow(opacity: 0.1),
+          SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 16,
+                bottom: bottomPadding,
               ),
-              const SizedBox(height: 20),
-
-              // INGREDIENTES
-              const Text(
-                'INGREDIENTES:',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: ingredientes.map((ing) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    child: Text(
-                      '• ${ing['nombre']} (${ing['cantidad']} ${ing['unidad']})',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                children: [
+                  // Tarjeta Header con Información General y Desglose Nutricional
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: AppColors.azureMist.withValues(alpha: 0.04),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.azureMist.withValues(alpha: 0.08),
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 25),
-
-              // PREPARACIÓN
-              const Text(
-                'PREPARACIÓN:',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: pasos.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${index + 1}. ',
+                          receta.nombre,
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primaryDark,
+                            color: Colors.white,
                           ),
                         ),
-                        Expanded(
-                          child: Text(
-                            pasos[index],
-                            style: const TextStyle(fontSize: 14, height: 1.3),
+                        if (receta.descripcion != null &&
+                            receta.descripcion!.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            receta.descripcion!,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textSecondary,
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.timer_outlined,
+                              size: 16,
+                              color: AppColors.lightGreen,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${receta.tiempoPreparacionMin} min',
+                              style: const TextStyle(
+                                color: AppColors.lightGreen,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            if (receta.dificultad != null) ...[
+                              const Icon(
+                                Icons.bar_chart_rounded,
+                                size: 16,
+                                color: AppColors.sageGreen,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                receta.dificultad!,
+                                style: const TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        const Divider(height: 24, color: Colors.white10),
+
+                        // --- SECCIÓN DE DESGLOSE NUTRICIONAL VISUAL ---
+                        const Text(
+                          'Aporte Nutricional',
+                          style: TextStyle(
+                            color: AppColors.lightGreen,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
                           ),
                         ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            _buildNutritionalBadge(
+                              'Calorías',
+                              '$calorias kcal',
+                              Icons.local_fire_department_rounded,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildNutritionalBadge(
+                              'Proteínas',
+                              '${proteinas.toStringAsFixed(0)}g',
+                              Icons.fitness_center_rounded,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildNutritionalBadge(
+                              'Carbos',
+                              '${carbos.toStringAsFixed(0)}g',
+                              Icons.grain_rounded,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildNutritionalBadge(
+                              'Grasas',
+                              '${grasas.toStringAsFixed(0)}g',
+                              Icons.opacity_rounded,
+                            ),
+                          ],
+                        ),
+                        if (receta.resumenNutricional != null &&
+                            receta.resumenNutricional!.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                        ],
                       ],
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Sección de Ingredientes
+                  if (receta.ingredientes.isNotEmpty) ...[
+                    RecipeIngredientsSection(ingredientes: receta.ingredientes),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Sección de Paso a Paso
+                  RecipeStepsSection(pasos: receta.pasos),
+                ],
               ),
-            ],
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNutritionalBadge(String label, String value, IconData icon) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        decoration: BoxDecoration(
+          color: AppColors.lightGreen.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.lightGreen.withValues(alpha: 0.2),
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 14, color: AppColors.lightGreen),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+            Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 10,
+              ),
+            ),
+          ],
         ),
       ),
     );
