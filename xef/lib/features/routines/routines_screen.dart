@@ -33,12 +33,23 @@ class RoutinesScreen extends StatelessWidget {
                               routineProvider.modalidadSeleccionada,
                           objetivoSeleccionado:
                               routineProvider.objetivoSeleccionado,
+                          nivelExperiencia: routineProvider.nivelExperiencia,
+                          gruposMuscularesSeleccionados:
+                              routineProvider.gruposMuscularesSeleccionados,
+                          observacionesEspeciales:
+                              routineProvider.observacionesEspeciales,
                           onDiaToggle: (dia, val) =>
                               routineProvider.toggleDia(dia, val),
                           onModalidadChanged: (val) =>
                               routineProvider.setModalidad(val),
                           onObjetivoChanged: (val) =>
                               routineProvider.setObjetivo(val),
+                          onNivelChanged: (val) =>
+                              routineProvider.setNivelExperiencia(val),
+                          onGrupoToggle: (grupo, val) =>
+                              routineProvider.toggleGrupoMuscular(grupo, val),
+                          onObservacionesChanged: (val) =>
+                              routineProvider.setObservaciones(val),
                           onGenerar: () async {
                             final ok = await routineProvider
                                 .generarRutinasConIA();

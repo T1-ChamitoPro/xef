@@ -5,15 +5,20 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/selectable_card.dart';
 
-/// Formulario para configurar parámetros y generar rutinas con IA
 class RoutineFormView extends StatelessWidget {
   final Set<String> diasSeleccionados;
   final String modalidadSeleccionada;
   final String objetivoSeleccionado;
+  final String nivelExperiencia;
+  final Set<String> gruposMuscularesSeleccionados;
+  final String observacionesEspeciales;
 
   final void Function(String dia, bool selected) onDiaToggle;
   final ValueChanged<String> onModalidadChanged;
   final ValueChanged<String> onObjetivoChanged;
+  final ValueChanged<String> onNivelChanged;
+  final void Function(String grupo, bool selected) onGrupoToggle;
+  final ValueChanged<String> onObservacionesChanged;
   final VoidCallback onGenerar;
 
   const RoutineFormView({
@@ -21,9 +26,15 @@ class RoutineFormView extends StatelessWidget {
     required this.diasSeleccionados,
     required this.modalidadSeleccionada,
     required this.objetivoSeleccionado,
+    required this.nivelExperiencia,
+    required this.gruposMuscularesSeleccionados,
+    required this.observacionesEspeciales,
     required this.onDiaToggle,
     required this.onModalidadChanged,
     required this.onObjetivoChanged,
+    required this.onNivelChanged,
+    required this.onGrupoToggle,
+    required this.onObservacionesChanged,
     required this.onGenerar,
   });
 
@@ -68,7 +79,7 @@ class RoutineFormView extends StatelessWidget {
           ),
           const SizedBox(height: 32),
 
-          // Selección de Días
+          // Días
           const SectionHeader(
             title: 'Días de entrenamiento',
             icon: Icons.calendar_month_rounded,
@@ -124,10 +135,9 @@ class RoutineFormView extends StatelessWidget {
             itemCount: AppConstants.modalidadesRutina.length,
             itemBuilder: (context, index) {
               final mod = AppConstants.modalidadesRutina[index];
-              final selected = modalidadSeleccionada == mod;
               return SelectableCard(
                 label: mod,
-                isSelected: selected,
+                isSelected: modalidadSeleccionada == mod,
                 centerText: true,
                 compact: true,
                 onTap: () => onModalidadChanged(mod),
@@ -154,18 +164,133 @@ class RoutineFormView extends StatelessWidget {
             itemCount: AppConstants.objetivosRutina.length,
             itemBuilder: (context, index) {
               final obj = AppConstants.objetivosRutina[index];
-              final selected = objetivoSeleccionado == obj;
               return SelectableCard(
                 label: obj,
-                isSelected: selected,
+                isSelected: objetivoSeleccionado == obj,
                 centerText: true,
                 onTap: () => onObjetivoChanged(obj),
               );
             },
           ),
+          const SizedBox(height: 28),
+
+          // Nivel de experiencia
+          const SectionHeader(
+            title: 'Nivel de experiencia',
+            icon: Icons.stairs_rounded,
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: AppConstants.nivelesExperiencia.map((nivel) {
+              final selected = nivelExperiencia == nivel;
+              return ChoiceChip(
+                label: Text(nivel),
+                selected: selected,
+                selectedColor: AppColors.lightGreen,
+                backgroundColor: AppColors.azureMist.withValues(alpha: 0.05),
+                labelStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: selected ? AppColors.textDark : AppColors.textPrimary,
+                ),
+                side: BorderSide(
+                  color: selected
+                      ? AppColors.lightGreen
+                      : AppColors.azureMist.withValues(alpha: 0.12),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                onSelected: (_) => onNivelChanged(nivel),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 28),
+
+          // Grupos musculares
+          const SectionHeader(
+            title: 'Grupos musculares a priorizar',
+            icon: Icons.accessibility_new_rounded,
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Selecciona los que quieras enfatizar (opcional)',
+            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 10,
+            children: AppConstants.gruposMusculares.map((grupo) {
+              final selected = gruposMuscularesSeleccionados.contains(grupo);
+              return FilterChip(
+                label: Text(grupo),
+                selected: selected,
+                selectedColor: AppColors.lightGreen.withValues(alpha: 0.85),
+                backgroundColor: AppColors.azureMist.withValues(alpha: 0.05),
+                checkmarkColor: AppColors.textDark,
+                labelStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                  color: selected ? AppColors.textDark : AppColors.textPrimary,
+                ),
+                side: BorderSide(
+                  color: selected
+                      ? AppColors.lightGreen
+                      : AppColors.azureMist.withValues(alpha: 0.12),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                onSelected: (val) => onGrupoToggle(grupo, val),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 28),
+
+          // Observaciones
+          const SectionHeader(
+            title: 'Observaciones especiales',
+            icon: Icons.notes_rounded,
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            maxLines: 3,
+            style: const TextStyle(color: AppColors.textPrimary),
+            decoration: InputDecoration(
+              hintText: 'Ej: Lesión de rodilla, prefiero poco material, evitar impacto...',
+              hintStyle: TextStyle(
+                color: AppColors.textSecondary.withValues(alpha: 0.6),
+              ),
+              filled: true,
+              fillColor: AppColors.azureMist.withValues(alpha: 0.05),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: AppColors.azureMist.withValues(alpha: 0.12),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: AppColors.azureMist.withValues(alpha: 0.12),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: AppColors.lightGreen),
+              ),
+            ),
+            onChanged: onObservacionesChanged,
+            controller: TextEditingController(text: observacionesEspeciales)
+              ..selection = TextSelection.collapsed(
+                offset: observacionesEspeciales.length,
+              ),
+          ),
           const SizedBox(height: 36),
 
-          // Botón de Acción
+          // Botón
           SizedBox(
             width: double.infinity,
             height: 56,

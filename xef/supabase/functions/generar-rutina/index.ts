@@ -11,7 +11,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json()
-    const { dias, modalidad, objetivo } = body
+    const { dias, modalidad, objetivo, nivel, grupos_musculares, observaciones } = body
 
     if (!dias || !Array.isArray(dias) || dias.length === 0) {
       return new Response(JSON.stringify({ error: 'Falta el parámetro "dias"' }), {
@@ -26,56 +26,40 @@ Deno.serve(async (req: Request) => {
     }
 
     const prompt = `
-Eres un entrenador personal profesional certificado.
+      Eres un entrenador personal profesional certificado.
 
-Genera exactamente 2 opciones de rutinas de ejercicio distintas y realistas según estos datos:
-- Días de entrenamiento: ${JSON.stringify(dias)}
-- Modalidad: ${modalidad || 'gimnasio'}
-- Objetivo: ${objetivo || 'salud general'}
+      Genera exactamente 2 opciones de rutinas de ejercicio distintas y realistas según estos datos:
+      - Días de entrenamiento: ${JSON.stringify(dias)}
+      - Modalidad: ${modalidad || 'gimnasio'}
+      - Objetivo: ${objetivo || 'salud general'}
+      - Nivel de experiencia: ${nivel || 'Intermedio'}
+      - Grupos musculares a priorizar: ${JSON.stringify(grupos_musculares || [])}
+      - Observaciones especiales del usuario: ${observaciones || 'Ninguna'}
 
-Devuelve ÚNICAMENTE un array JSON válido (sin markdown ni texto extra) con este formato exacto:
+      Devuelve ÚNICAMENTE un array JSON válido (sin markdown ni texto extra) con este formato exacto:
 
-[
-  {
-    "titulo": "Rutina Full Body Principiante",
-    "descripcion": "Enfocada en construir base de fuerza y técnica con ejercicios compuestos.",
-    "ejercicios": {
-      "LUNES": [
-        "Sentadilla con peso corporal 3x12",
-        "Flexiones de pecho 3x10",
-        "Remo con banda 3x12",
-        "Plancha 3x30 segundos"
-      ],
-      "MIÉRCOLES": [
-        "Peso muerto rumano con mancuernas 3x10",
-        "Press militar con mancuernas 3x10",
-        "Zancadas 3x10 por pierna",
-        "Elevaciones laterales 3x12"
+      [
+        {
+          "titulo": "Nombre de la rutina",
+          "descripcion": "Breve explicación de la estrategia",
+          "ejercicios": {
+            "LUNES": [
+              "Ejercicio 1 4x10",
+              "Ejercicio 2 3x12"
+            ]
+          }
+        }
       ]
-    }
-  },
-  {
-    "titulo": "Rutina Hipertrofia Intermedia",
-    "descripcion": "Enfocada en volumen muscular y progresión de cargas.",
-    "ejercicios": {
-      "LUNES": [
-        "Sentadilla con barra 4x8",
-        "Press banca 4x8",
-        "Remo con barra 4x10",
-        "Fondos en paralelas 3x10"
-      ]
-    }
-  }
-]
 
-Reglas importantes:
-- Genera exactamente 2 planes diferentes.
-- Dentro de "ejercicios" incluye TODOS los días que te pasé (usa los nombres exactos en MAYÚSCULAS).
-- Cada día debe ser un array de strings con el formato: "Nombre del ejercicio series x repeticiones".
-- Adapta los ejercicios a la modalidad (${modalidad}) y al objetivo (${objetivo}).
-- Sé realista con el volumen según el nivel implícito del objetivo.
-- No agregues ningún texto fuera del JSON.
-`
+      Reglas importantes:
+      - Genera exactamente 2 planes diferentes.
+      - Incluye TODOS los días recibidos (nombres en MAYÚSCULAS).
+      - Prioriza los grupos musculares indicados.
+      - Adapta volumen e intensidad al nivel (${nivel || 'Intermedio'}).
+      - Respeta las observaciones especiales del usuario.
+      - Cada ejercicio debe ir con series x repeticiones (o tiempo).
+      - No agregues texto fuera del JSON.
+    `
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${RUTINA_API_KEY}`,
