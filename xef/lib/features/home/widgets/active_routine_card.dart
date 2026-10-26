@@ -49,7 +49,7 @@ class ActiveRoutineCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionHeader(
-          title: 'Rutina de hoy ($diaSemana)',
+          title: 'Rutina de hoy',
           icon: Icons.fitness_center_rounded,
           onDelete: rutinaActiva != null ? onDelete : null,
         ),

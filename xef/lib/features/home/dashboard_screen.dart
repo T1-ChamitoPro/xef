@@ -135,14 +135,31 @@ class DashboardScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 24),
+
+                    // IMC
                     ImcCard(perfil: authProvider.perfil),
                     const SizedBox(height: 28),
+
+                    // ===== TÍTULO DEL DÍA =====
+                    Center(
+                      child: Text(
+                        diaSemana,
+                        textAlign: TextAlign.center,
+                        style:
+                            AppColors.dayTitleStyle, // o AppTheme.dayTitleStyle
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Dieta activa
                     ActiveDietCard(
                       dietaActiva: dietProvider.dietaActiva,
                       diaSemana: diaSemana,
                       onDelete: () => _eliminarDieta(context),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 20),
+
+                    // Rutina activa
                     ActiveRoutineCard(
                       rutinaActiva: routineProvider.rutinaActiva,
                       diaSemana: diaSemana,

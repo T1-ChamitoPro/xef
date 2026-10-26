@@ -3,6 +3,26 @@ import 'package:flutter/services.dart';
 
 /// Paleta de colores oficial mapeada desde la imagen
 abstract class AppColors {
+  // Estilo del título del día (cristalino)
+  static TextStyle dayTitleStyle = TextStyle(
+    fontSize: 46,
+    fontWeight: FontWeight.w800,
+    height: 0.9,
+    letterSpacing: 4,
+    color: lightGreen.withValues(alpha: 0.85), // verde translúcido del tema
+    shadows: [
+      Shadow(
+        color: lightGreen.withValues(alpha: 0.25),
+        blurRadius: 24,
+        offset: const Offset(0, 6),
+      ),
+      Shadow(
+        color: Colors.black.withValues(alpha: 0.2),
+        blurRadius: 10,
+        offset: const Offset(0, 3),
+      ),
+    ],
+  );
   // Colores Base de la Paleta
   static const Color azureMist = Color(
     0xFFE6FAFC,
@@ -42,6 +62,25 @@ abstract class AppColors {
 }
 
 class AppTheme {
+  static TextStyle get dayTitleStyle => TextStyle(
+    fontSize: 46,
+    fontWeight: FontWeight.w800,
+    height: 0.9,
+    letterSpacing: 4,
+    color: AppColors.lightGreen.withValues(alpha: 0.85),
+    shadows: [
+      Shadow(
+        color: AppColors.lightGreen.withValues(alpha: 0.25),
+        blurRadius: 24,
+        offset: const Offset(0, 6),
+      ),
+      Shadow(
+        color: Colors.black.withValues(alpha: 0.2),
+        blurRadius: 10,
+        offset: const Offset(0, 3),
+      ),
+    ],
+  );
   static ThemeData get theme {
     return ThemeData(
       useMaterial3: true,
