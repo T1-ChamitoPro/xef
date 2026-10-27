@@ -59,13 +59,12 @@ class HistorialProvider extends ChangeNotifier {
     final estaCompletada = isComidaCompletada(comida.tipoComida, comida.nombre);
     final listaOriginal = List<HistorialComida>.from(_historialHoy!.comidas);
 
-    // 1. Actualización optimista local
+    // 1. Actualización optimista inmediata (0ms de retraso visual)
     if (estaCompletada) {
       _historialHoy!.comidas.removeWhere(
         (c) => c.tipoComida == comida.tipoComida && c.nombre == comida.nombre,
       );
     } else {
-      // Remover si había otra de distinto nombre en el mismo tipo (reemplazo)
       _historialHoy!.comidas.removeWhere(
         (c) => c.tipoComida == comida.tipoComida,
       );
@@ -73,7 +72,7 @@ class HistorialProvider extends ChangeNotifier {
     }
     notifyListeners();
 
-    // 2. Persistir en backend
+    // 2. Persistencia transparente en backend (sin re-fetching que revierta el estado)
     try {
       if (estaCompletada) {
         final itemAEliminar = listaOriginal.firstWhere(
@@ -88,14 +87,9 @@ class HistorialProvider extends ChangeNotifier {
           comida: comida,
         );
       }
-
-      // Sincronizar IDs asignados sin tumbar la lista si no es estrictamente necesario
-      final actualizado = await _historialService.obtenerOCrearHistorialHoy();
-      _historialHoy = actualizado;
-      notifyListeners();
     } catch (e) {
       debugPrint('❌ Error al guardar comida en Supabase: $e');
-      // Revertir solo si falló la red/DB
+      // Revertir únicamente en caso de falla real de red o base de datos
       _historialHoy = HistorialDia(
         id: _historialHoy!.id,
         fecha: _historialHoy!.fecha,
@@ -123,7 +117,7 @@ class HistorialProvider extends ChangeNotifier {
       _historialHoy!.ejercicios,
     );
 
-    // 1. Actualización optimista local
+    // 1. Actualización optimista inmediata
     if (estaCompletado) {
       _historialHoy!.ejercicios.removeWhere(
         (e) => e.nombre == ejercicio.nombre,
@@ -133,7 +127,7 @@ class HistorialProvider extends ChangeNotifier {
     }
     notifyListeners();
 
-    // 2. Persistir en backend
+    // 2. Persistencia transparente en backend
     try {
       if (estaCompletado) {
         final itemAEliminar = listaOriginal.firstWhere(
@@ -148,10 +142,6 @@ class HistorialProvider extends ChangeNotifier {
           ejercicio: ejercicio,
         );
       }
-
-      final actualizado = await _historialService.obtenerOCrearHistorialHoy();
-      _historialHoy = actualizado;
-      notifyListeners();
     } catch (e) {
       debugPrint('❌ Error al guardar ejercicio en Supabase: $e');
       _historialHoy = HistorialDia(

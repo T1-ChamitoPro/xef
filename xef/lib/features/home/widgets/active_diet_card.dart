@@ -1,4 +1,3 @@
-// En ActiveDietCard
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +19,6 @@ class ActiveDietCard extends StatelessWidget {
     this.onDelete,
   });
 
-  /// Estima o asigna macronutrientes según el plato o tipo de comida
   HistorialComida _crearHistorialComida(String tipo, String plato) {
     int calorias = 450;
     double proteinas = 30;
@@ -174,17 +172,19 @@ class ActiveDietCard extends StatelessWidget {
     final completado = historialProvider.isComidaCompletada(tipo, plato);
 
     return InkWell(
+      splashColor: Colors.transparent, // Elimina la onda blanca
+      highlightColor: Colors.transparent, // Elimina el destello retenido
+      borderRadius: BorderRadius.circular(10),
       onTap: () {
         historialProvider.toggleComida(_crearHistorialComida(tipo, plato));
       },
-      borderRadius: BorderRadius.circular(10),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 150),
               margin: const EdgeInsets.only(top: 2),
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(

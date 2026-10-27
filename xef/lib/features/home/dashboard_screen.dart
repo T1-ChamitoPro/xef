@@ -7,6 +7,7 @@ import '../../core/widgets/background_glow.dart';
 import '../../core/widgets/confirmation_dialog.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/diet_provider.dart';
+import '../../providers/historial_provider.dart';
 import '../../providers/routine_provider.dart';
 import 'widgets/active_diet_card.dart';
 import 'widgets/active_routine_card.dart';
@@ -62,11 +63,36 @@ class DashboardScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _registrarDia(BuildContext context) async {
+    final historialProvider = context.read<HistorialProvider>();
+
+    // Aseguramos que el historial de hoy esté cargado antes de procesar la consolidación
+    await historialProvider.cargarHistorialHoy();
+
+    if (!context.mounted) return;
+
+    final exito = await historialProvider.finalizarYGuardarDia();
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            exito
+                ? '¡Jornada de hoy guardada en tu historial!'
+                : 'Error al registrar la jornada en Supabase.',
+          ),
+          backgroundColor: exito ? AppColors.oliveLeaf : AppColors.errorRed,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final dietProvider = context.watch<DietProvider>();
     final routineProvider = context.watch<RoutineProvider>();
+    final historialProvider = context.watch<HistorialProvider>();
 
     final isInitialLoading =
         authProvider.isLoading && authProvider.perfil == null;
@@ -81,6 +107,9 @@ class DashboardScreen extends StatelessWidget {
     }
 
     final diaSemana = AppDateUtils.getDiaActual();
+    final tienePlan =
+        dietProvider.dietaActiva != null ||
+        routineProvider.rutinaActiva != null;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -96,6 +125,7 @@ class DashboardScreen extends StatelessWidget {
                   authProvider.cargarPerfil(),
                   dietProvider.cargarDietaActiva(),
                   routineProvider.cargarRutinaActiva(),
+                  historialProvider.cargarHistorialHoy(),
                 ]);
               },
               child: SingleChildScrollView(
@@ -145,8 +175,7 @@ class DashboardScreen extends StatelessWidget {
                       child: Text(
                         diaSemana,
                         textAlign: TextAlign.center,
-                        style:
-                            AppColors.dayTitleStyle, // o AppTheme.dayTitleStyle
+                        style: AppColors.dayTitleStyle,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -165,7 +194,50 @@ class DashboardScreen extends StatelessWidget {
                       diaSemana: diaSemana,
                       onDelete: () => _eliminarRutina(context),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 28),
+
+                    // ===== BOTÓN REGISTRAR DÍA EN HISTORIAL =====
+                    SizedBox(
+                      width: double.infinity,
+                      height: 54,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: tienePlan
+                              ? AppColors.lightGreen
+                              : AppColors.azureMist.withValues(alpha: 0.12),
+                          foregroundColor: tienePlan
+                              ? AppColors.textDark
+                              : AppColors.textMuted,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: tienePlan ? 2 : 0,
+                        ),
+                        icon: historialProvider.isSaving
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.textDark,
+                                ),
+                              )
+                            : const Icon(Icons.check_circle_rounded, size: 22),
+                        label: Text(
+                          historialProvider.isSaving
+                              ? 'Guardando en historial...'
+                              : 'Registrar Día en Historial',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: (historialProvider.isSaving)
+                            ? null
+                            : () => _registrarDia(context),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
