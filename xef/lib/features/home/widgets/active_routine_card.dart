@@ -1,4 +1,3 @@
-// En ActiveRoutineCard
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +19,6 @@ class ActiveRoutineCard extends StatelessWidget {
     this.onDelete,
   });
 
-  /// Extrae series y repeticiones de textos como "Sentadilla 4x8-10" o "Curl 3x12"
   HistorialEjercicio _parsearEjercicio(String texto) {
     final exp = RegExp(r'(\d+)\s*x\s*(\d+)');
     final match = exp.firstMatch(texto);
@@ -73,12 +71,14 @@ class ActiveRoutineCard extends StatelessWidget {
                             .isEjercicioCompletado(ej);
 
                         return InkWell(
+                          splashColor: Colors.transparent, // Sin bloom blanco
+                          highlightColor: Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
                           onTap: () {
                             historialProvider.toggleEjercicio(
                               _parsearEjercicio(ej),
                             );
                           },
-                          borderRadius: BorderRadius.circular(10),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 6,
@@ -87,7 +87,7 @@ class ActiveRoutineCard extends StatelessWidget {
                             child: Row(
                               children: [
                                 AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
+                                  duration: const Duration(milliseconds: 150),
                                   padding: const EdgeInsets.all(2),
                                   decoration: BoxDecoration(
                                     color: completado

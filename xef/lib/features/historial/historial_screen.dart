@@ -24,7 +24,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculamos el espacio inferior dinámico para evitar que el wrapper tape las tarjetas
     final double bottomPadding = MediaQuery.of(context).padding.bottom + 110.0;
 
     return Scaffold(
@@ -63,7 +62,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                   left: 20,
                   right: 20,
                   top: 12,
-                  bottom: bottomPadding, // <--- Safezone inferior garantizada
+                  bottom: bottomPadding,
                 ),
                 itemCount: provider.listaHistorial.length,
                 itemBuilder: (context, index) {

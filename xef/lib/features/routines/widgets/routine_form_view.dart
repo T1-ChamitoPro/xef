@@ -92,7 +92,7 @@ class RoutineFormView extends StatelessWidget {
               final selected = diasSeleccionados.contains(dia);
               return ChoiceChip(
                 label: Text(
-                  dia.substring(0, 3),
+                  dia.substring(0, 3).toUpperCase(),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: selected
@@ -117,7 +117,7 @@ class RoutineFormView extends StatelessWidget {
           ),
           const SizedBox(height: 28),
 
-          // Modalidad
+          // Modalidad (2 columnas para evitar overflow)
           const SectionHeader(
             title: 'Modalidad de entrenamiento',
             icon: Icons.home_repair_service_rounded,
@@ -127,8 +127,8 @@ class RoutineFormView extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 2.2,
+              crossAxisCount: 2,
+              childAspectRatio: 2.3,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
             ),
@@ -146,7 +146,7 @@ class RoutineFormView extends StatelessWidget {
           ),
           const SizedBox(height: 28),
 
-          // Objetivo
+          // Objetivo (2 columnas optimizadas)
           const SectionHeader(
             title: 'Objetivo de tu entrenamiento',
             icon: Icons.track_changes_rounded,
@@ -157,9 +157,9 @@ class RoutineFormView extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 2.4,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+              childAspectRatio: 2.5,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
             ),
             itemCount: AppConstants.objetivosRutina.length,
             itemBuilder: (context, index) {
@@ -168,6 +168,7 @@ class RoutineFormView extends StatelessWidget {
                 label: obj,
                 isSelected: objetivoSeleccionado == obj,
                 centerText: true,
+                compact: true,
                 onTap: () => onObjetivoChanged(obj),
               );
             },
