@@ -22,7 +22,7 @@ class DashboardHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Hola, $primerNombre 👋',
+              'Hola, $primerNombre',
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,

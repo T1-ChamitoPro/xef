@@ -1,106 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Paleta de colores oficial mapeada desde la imagen
+/// Paleta oficial de XEF: carbón oscuro y verde lima.
 abstract class AppColors {
-  // Estilo del título del día (cristalino)
-  static TextStyle dayTitleStyle = TextStyle(
+  // Colores base inspirados en el logo y el splash de XEF.
+  static const Color azureMist = Color(0xFFEAF0E8);
+  static const Color lightGreen = Color(0xFFA6FF00);
+  static const Color sageGreen = Color(0xFF78A832);
+  static const Color oliveLeaf = Color(0xFF202522);
+  static const Color charcoalBrown = Color(0xFF080909);
+
+  // Mapeo semántico: se conservan los nombres para evitar romper referencias.
+  static const Color background = charcoalBrown;
+  static const Color surface = Color(0xFF101112);
+  static const Color cardBg = Color(0xFF17191A);
+  static const Color accentGreen = lightGreen;
+
+  // Textos y contraste.
+  static const Color textPrimary = azureMist;
+  static const Color textSecondary = Color(0xBFEAF0E8);
+  static const Color textMuted = Color(0x80EAF0E8);
+  static const Color textDark = Color(0xFF10130A);
+
+  // Estados.
+  static const Color errorRed = Color(0xFFFF6B6B);
+  static const Color successGreen = lightGreen;
+
+  // Se mantiene disponible para widgets que usen AppColors.dayTitleStyle.
+  // Sin glow, para respetar la identidad limpia del splash.
+  static TextStyle dayTitleStyle = const TextStyle(
     fontSize: 46,
     fontWeight: FontWeight.w800,
     height: 0.9,
     letterSpacing: 4,
-    color: lightGreen.withValues(alpha: 0.85), // verde translúcido del tema
-    shadows: [
-      Shadow(
-        color: lightGreen.withValues(alpha: 0.25),
-        blurRadius: 24,
-        offset: const Offset(0, 6),
-      ),
-      Shadow(
-        color: Colors.black.withValues(alpha: 0.2),
-        blurRadius: 10,
-        offset: const Offset(0, 3),
-      ),
-    ],
+    color: lightGreen,
   );
-  // Colores Base de la Paleta
-  static const Color azureMist = Color(
-    0xFFE6FAFC,
-  ); // #E6FAFC - Fondo claro / Textos principales
-  static const Color lightGreen = Color(
-    0xFF9CFC97,
-  ); // #9CFC97 - Acento neón vibrante / Botones primarios
-  static const Color sageGreen = Color(
-    0xFF6BA368,
-  ); // #6BA368 - Verde medio / Bordes y detalles
-  static const Color oliveLeaf = Color(
-    0xFF515B3A,
-  ); // #515B3A - Verde oliva oscuro / Tarjetas elevadas
-  static const Color charcoalBrown = Color(
-    0xFF353D2F,
-  ); // #353D2F - Fondo oscuro principal
-
-  // Mapeo Semántico
-  static const Color background = charcoalBrown;
-  static const Color surface = Color(
-    0xFF2E3529,
-  ); // Superficie ligeramente más oscura para capas
-  static const Color cardBg = oliveLeaf;
-  static const Color accentGreen = lightGreen;
-
-  // Textos y Contraste
-  static const Color textPrimary = azureMist;
-  static const Color textSecondary = Color(0xB3E6FAFC); // Azure Mist al 70%
-  static const Color textMuted = Color(0x80E6FAFC); // Azure Mist al 50%
-  static const Color textDark = Color(
-    0xFF1B2219,
-  ); // Texto oscuro legible dentro de botones de acento
-
-  // Estados
-  static const Color errorRed = Color(0xFFFF6B6B);
-  static const Color successGreen = lightGreen;
 }
 
 class AppTheme {
-  static TextStyle get dayTitleStyle => TextStyle(
+  // Se conserva el getter público para no romper widgets existentes.
+  static TextStyle get dayTitleStyle => const TextStyle(
     fontSize: 46,
     fontWeight: FontWeight.w800,
     height: 0.9,
     letterSpacing: 4,
-    color: AppColors.lightGreen.withValues(alpha: 0.85),
-    shadows: [
-      Shadow(
-        color: AppColors.lightGreen.withValues(alpha: 0.25),
-        blurRadius: 24,
-        offset: const Offset(0, 6),
-      ),
-      Shadow(
-        color: Colors.black.withValues(alpha: 0.2),
-        blurRadius: 10,
-        offset: const Offset(0, 3),
-      ),
-    ],
+    color: AppColors.lightGreen,
   );
+
   static ThemeData get theme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.background,
       primaryColor: AppColors.lightGreen,
-
-      // ColorScheme bien estructurado para Flutter 3+
       colorScheme: const ColorScheme.dark(
         primary: AppColors.lightGreen,
         onPrimary: AppColors.textDark,
         secondary: AppColors.sageGreen,
         onSecondary: AppColors.textPrimary,
-        surface: AppColors.cardBg,
+        surface: AppColors.surface,
         onSurface: AppColors.textPrimary,
         error: AppColors.errorRed,
         onError: Colors.white,
       ),
 
-      // Tipografía Unificada
+      // Tipografía global.
       textTheme: const TextTheme(
         displayLarge: TextStyle(
           color: AppColors.textPrimary,
@@ -120,7 +84,8 @@ class AppTheme {
         ),
       ),
 
-      // Estilo global para AppBar con control de System UI
+      iconTheme: const IconThemeData(color: AppColors.textSecondary),
+
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -133,7 +98,7 @@ class AppTheme {
         ),
       ),
 
-      // Estilo de Tarjetas Modernas (Sutil brillo en bordes)
+      // Tarjetas oscuras con borde discreto, sin efectos luminosos.
       cardTheme: CardThemeData(
         color: AppColors.cardBg,
         elevation: 0,
@@ -141,20 +106,25 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
-            color: AppColors.sageGreen.withValues(alpha: 0.3),
+            color: AppColors.sageGreen.withValues(alpha: 0.22),
             width: 1,
           ),
         ),
       ),
 
-      // Estilo de Campos de Texto (Inputs)
+      dividerTheme: DividerThemeData(
+        color: AppColors.textPrimary.withValues(alpha: 0.10),
+        thickness: 1,
+        space: 1,
+      ),
+
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.azureMist.withValues(alpha: 0.05),
+        fillColor: AppColors.surface,
         hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
         labelStyle: const TextStyle(color: AppColors.textSecondary),
         prefixIconColor: AppColors.lightGreen,
-        suffixIconColor: AppColors.sageGreen,
+        suffixIconColor: AppColors.textSecondary,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
@@ -162,7 +132,7 @@ class AppTheme {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: AppColors.azureMist.withValues(alpha: 0.12),
+            color: AppColors.textPrimary.withValues(alpha: 0.12),
             width: 1,
           ),
         ),
@@ -180,11 +150,12 @@ class AppTheme {
         ),
       ),
 
-      // Botón Elevado Principal (Fondo verde neón con texto oscuro contrastado)
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.lightGreen,
           foregroundColor: AppColors.textDark,
+          disabledBackgroundColor: AppColors.sageGreen,
+          disabledForegroundColor: AppColors.textPrimary,
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           shape: RoundedRectangleBorder(
@@ -198,13 +169,12 @@ class AppTheme {
         ),
       ),
 
-      // Botón Delineado Secundario
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimary,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           side: BorderSide(
-            color: AppColors.sageGreen.withValues(alpha: 0.6),
+            color: AppColors.sageGreen.withValues(alpha: 0.65),
             width: 1.5,
           ),
           shape: RoundedRectangleBorder(
@@ -214,14 +184,13 @@ class AppTheme {
         ),
       ),
 
-      // Notificaciones / SnackBars
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.oliveLeaf,
-        contentTextStyle: const TextStyle(color: AppColors.azureMist),
+        backgroundColor: AppColors.cardBg,
+        contentTextStyle: const TextStyle(color: AppColors.textPrimary),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
-          side: BorderSide(color: AppColors.sageGreen.withValues(alpha: 0.3)),
+          side: BorderSide(color: AppColors.sageGreen.withValues(alpha: 0.25)),
         ),
       ),
     );

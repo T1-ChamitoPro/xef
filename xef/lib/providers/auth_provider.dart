@@ -110,7 +110,6 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Actualiza los datos del usuario en la tabla 'usuario' de Supabase
-  /// Actualiza los datos del usuario en la tabla 'usuario' de Supabase
   Future<bool> actualizarPerfil({
     required String nombre,
     required String apellido,

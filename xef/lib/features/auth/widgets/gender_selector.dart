@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
 
-/// Selector desplegable para el sexo biológico con estilo personalizado
+/// Selector desplegable para el sexo biológico.
 class GenderSelector extends StatelessWidget {
   final String selectedValue;
   final ValueChanged<String> onChanged;
@@ -15,13 +16,26 @@ class GenderSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Elimina opciones duplicadas para evitar errores de Flutter.
+    final opciones = AppConstants.opcionesSexo.toSet().toList();
+
+    // Busca el valor real de la lista sin distinguir mayúsculas.
+    String? valorSeleccionado;
+
+    for (final opcion in opciones) {
+      if (opcion.trim().toLowerCase() == selectedValue.trim().toLowerCase()) {
+        valorSeleccionado = opcion;
+        break;
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.azureMist.withValues(alpha: 0.04),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.azureMist.withValues(alpha: 0.08),
+          color: AppColors.textPrimary.withValues(alpha: 0.08),
         ),
       ),
       child: Row(
@@ -39,7 +53,9 @@ class GenderSelector extends StatelessWidget {
           Expanded(
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
-                value: selectedValue,
+                value: valorSeleccionado,
+                isExpanded: true,
+                hint: const Text('Seleccionar'),
                 dropdownColor: AppColors.cardBg,
                 icon: const Icon(
                   Icons.arrow_drop_down,
@@ -55,9 +71,7 @@ class GenderSelector extends StatelessWidget {
                     onChanged(newValue);
                   }
                 },
-                items: AppConstants.opcionesSexo.map<DropdownMenuItem<String>>((
-                  String value,
-                ) {
+                items: opciones.map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),

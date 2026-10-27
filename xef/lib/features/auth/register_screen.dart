@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/custom_text_field.dart';
 import '../../providers/auth_provider.dart';
@@ -21,7 +22,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _alturaController = TextEditingController();
   final _pesoController = TextEditingController();
 
-  String _sexoSeleccionado = 'Masculino';
+  String _sexoSeleccionado = AppConstants.opcionesSexo.isNotEmpty
+      ? AppConstants.opcionesSexo.first
+      : 'Masculino';
 
   @override
   void dispose() {
@@ -79,9 +82,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Registro exitoso! Iniciando sesión...'),
-        ),
+        const SnackBar(content: Text('¡Registro exitoso! Iniciando sesión...')),
       );
       Navigator.of(context).pop();
     } else if (!success && mounted && authProvider.errorMessage != null) {

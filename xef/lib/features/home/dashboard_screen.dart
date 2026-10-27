@@ -175,7 +175,14 @@ class DashboardScreen extends StatelessWidget {
                       child: Text(
                         diaSemana,
                         textAlign: TextAlign.center,
-                        style: AppColors.dayTitleStyle,
+                        style: const TextStyle(
+                          fontSize: 46,
+                          fontWeight: FontWeight.w800,
+                          height: 0.9,
+                          letterSpacing: 4,
+                          color: AppColors.lightGreen,
+                          shadows: [],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
