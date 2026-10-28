@@ -1,5 +1,4 @@
 Deno.serve(async (req: Request) => {
-  // CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', {
       headers: {
@@ -25,60 +24,54 @@ Deno.serve(async (req: Request) => {
       throw new Error('GEMINI_API_KEY no está configurada en los secrets de Supabase')
     }
 
-    const prompt = `
-Eres un nutricionista profesional certificado con amplia experiencia en planes alimenticios personalizados.
+    const randomSeed = Math.random().toString(36).substring(7)
+    const tieneIntolerancias = intolerancias && Array.isArray(intolerancias) && intolerancias.length > 0
 
-Genera exactamente 2 opciones de dietas distintas y realistas según estos datos del usuario:
+    const prompt = `
+Eres un Nutricionista Clínico Certificado y Chef Nutricional de Alto Rendimiento.
+
+Tu tarea es generar exactamente 3 propuestas de planes alimenticios COMPLETAMENTE DIVERSIFICADOS, prácticos y sabrosos basados en la siguiente información del usuario:
+
+DATOS DEL USUARIO:
 - Días a cubrir: ${JSON.stringify(dias)}
 - Objetivo nutricional: ${objetivo || 'BIENESTAR GENERAL'}
 - Estilo de vida: ${estiloVida || 'SEDENTARIO'}
 - Tipo de dieta: ${tipoDieta || 'BALANCEADA'}
-- Intolerancias / Alergias (NO incluir estos alimentos): ${JSON.stringify(intolerancias || [])}
+- INTOLERANCIAS Y ALERGIAS: ${JSON.stringify(intolerancias || [])}
+- Variador aleatorio de propuesta: ${randomSeed}
 
-Devuelve ÚNICAMENTE un array JSON válido (sin markdown ni texto extra) con este formato exacto:
+REGLAS STRICTAS OBLIGATORIAS:
+1. EXCLUSIÓN ABSOLUTA DE INTOLERANCIAS (REGLA DE ORO):
+   ${tieneIntolerancias 
+      ? `EL USUARIO ES INTOLERANTE O ALÉRGICO A: ${JSON.stringify(intolerancias)}. ESTÁ ABSOLUTAMENTE PROHIBIDO incluir estos ingredientes o derivados en cualquiera de las comidas (desayuno, almuerzo, cena). Sustitúyelos por alternativas nutritivas y equivalentes.`
+      : 'Sin alergias ni intolerancias reportadas, usa alimentos variados y balanceados.'}
 
+2. DIVERSIFICACIÓN Y NO REPETICIÓN:
+   - Genera exactamente 3 opciones de dietas distintas entre sí (Opción 1: Menú Práctico y Rápido, Opción 2: Enfoque Gourmet/Nutritivo, Opción 3: Enfoque de Densidad de Nutrientes).
+   - Varía los platos, fuentes de proteína, carbohidratos y grasas saludables en cada opción.
+
+3. DÍAS Y FORMATO:
+   - Incluye TODOS los días solicitados: ${JSON.stringify(dias)} (los nombres de las llaves de días dentro de "menu" deben estar estrictamente en MAYÚSCULAS).
+   - Cada día debe tener obligatoriamente las tres comidas: "desayuno", "almuerzo" y "cena".
+
+FORMATO DE SALIDA EXCLUSIVO (Devuelve únicamente un JSON válido, sin textos externos ni bloques de markdown \`\`\`json):
 [
   {
-    "titulo": "Plan Déficit Calórico Balanceado",
-    "descripcion": "Enfocado en pérdida de grasa con comidas fáciles de preparar y alta saciedad.",
+    "titulo": "Título atractivo y descriptivo del Plan 1",
+    "descripcion": "Breve resumen de cómo esta opción cumple el objetivo de ${objetivo} respetando las intolerancias indicadas.",
     "menu": {
-      "LUNES": {
-        "desayuno": "Avena con plátano y canela + café negro",
-        "almuerzo": "Pechuga de pollo a la plancha 150g + arroz integral + ensalada de tomate y pepino",
-        "cena": "Salmón al horno + brócoli al vapor + puré de calabaza"
-      },
-      "MIÉRCOLES": {
-        "desayuno": "...",
-        "almuerzo": "...",
-        "cena": "..."
-      }
-    }
-  },
-  {
-    "titulo": "Plan Alto en Proteína",
-    "descripcion": "Diseñado para preservar masa muscular durante el déficit calórico.",
-    "menu": {
-      "LUNES": {
-        "desayuno": "...",
-        "almuerzo": "...",
-        "cena": "..."
+      "${dias[0] || 'LUNES'}": {
+        "desayuno": "Descripción completa de plato y porción aproximada",
+        "almuerzo": "Descripción completa de plato y porción aproximada",
+        "cena": "Descripción completa de plato y porción aproximada"
       }
     }
   }
 ]
-
-Reglas importantes:
-- Genera exactamente 2 planes diferentes.
-- Dentro de "menu" incluye TODOS los días que te pasé (usa los nombres exactos en MAYÚSCULAS).
-- Cada día debe tener exactamente las claves: "desayuno", "almuerzo" y "cena".
-- Adapta las porciones y alimentos al objetivo (${objetivo}), estilo de vida (${estiloVida}) y tipo de dieta (${tipoDieta}).
-- Respeta estrictamente las intolerancias/alergias: no uses ninguno de estos alimentos: ${JSON.stringify(intolerancias || [])}.
-- Sé realista, práctico y variado.
-- No agregues ningún texto fuera del JSON.
 `
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -86,7 +79,8 @@ Reglas importantes:
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             responseMimeType: 'application/json',
-            temperature: 0.7,
+            temperature: 0.9, 
+            topP: 0.95,
           },
         }),
       }
