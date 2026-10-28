@@ -5,7 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/selectable_card.dart';
 
-class RoutineFormView extends StatelessWidget {
+class RoutineFormView extends StatefulWidget {
   final Set<String> diasSeleccionados;
   final String modalidadSeleccionada;
   final String objetivoSeleccionado;
@@ -37,6 +37,36 @@ class RoutineFormView extends StatelessWidget {
     required this.onObservacionesChanged,
     required this.onGenerar,
   });
+
+  @override
+  State<RoutineFormView> createState() => _RoutineFormViewState();
+}
+
+class _RoutineFormViewState extends State<RoutineFormView> {
+  late final TextEditingController _obsController;
+
+  @override
+  void initState() {
+    super.initState();
+    _obsController = TextEditingController(
+      text: widget.observacionesEspeciales,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant RoutineFormView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.observacionesEspeciales != widget.observacionesEspeciales &&
+        _obsController.text != widget.observacionesEspeciales) {
+      _obsController.text = widget.observacionesEspeciales;
+    }
+  }
+
+  @override
+  void dispose() {
+    _obsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +119,7 @@ class RoutineFormView extends StatelessWidget {
             spacing: 8,
             runSpacing: 10,
             children: AppConstants.diasSemana.map((dia) {
-              final selected = diasSeleccionados.contains(dia);
+              final selected = widget.diasSeleccionados.contains(dia);
               return ChoiceChip(
                 label: Text(
                   dia.substring(0, 3).toUpperCase(),
@@ -111,13 +141,13 @@ class RoutineFormView extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                onSelected: (val) => onDiaToggle(dia, val),
+                onSelected: (val) => widget.onDiaToggle(dia, val),
               );
             }).toList(),
           ),
           const SizedBox(height: 28),
 
-          // Modalidad (2 columnas para evitar overflow)
+          // Modalidad
           const SectionHeader(
             title: 'Modalidad de entrenamiento',
             icon: Icons.home_repair_service_rounded,
@@ -137,16 +167,16 @@ class RoutineFormView extends StatelessWidget {
               final mod = AppConstants.modalidadesRutina[index];
               return SelectableCard(
                 label: mod,
-                isSelected: modalidadSeleccionada == mod,
+                isSelected: widget.modalidadSeleccionada == mod,
                 centerText: true,
                 compact: true,
-                onTap: () => onModalidadChanged(mod),
+                onTap: () => widget.onModalidadChanged(mod),
               );
             },
           ),
           const SizedBox(height: 28),
 
-          // Objetivo (2 columnas optimizadas)
+          // Objetivo
           const SectionHeader(
             title: 'Objetivo de tu entrenamiento',
             icon: Icons.track_changes_rounded,
@@ -166,16 +196,16 @@ class RoutineFormView extends StatelessWidget {
               final obj = AppConstants.objetivosRutina[index];
               return SelectableCard(
                 label: obj,
-                isSelected: objetivoSeleccionado == obj,
+                isSelected: widget.objetivoSeleccionado == obj,
                 centerText: true,
                 compact: true,
-                onTap: () => onObjetivoChanged(obj),
+                onTap: () => widget.onObjetivoChanged(obj),
               );
             },
           ),
           const SizedBox(height: 28),
 
-          // Nivel de experiencia
+          // Nivel
           const SectionHeader(
             title: 'Nivel de experiencia',
             icon: Icons.stairs_rounded,
@@ -185,7 +215,7 @@ class RoutineFormView extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: AppConstants.nivelesExperiencia.map((nivel) {
-              final selected = nivelExperiencia == nivel;
+              final selected = widget.nivelExperiencia == nivel;
               return ChoiceChip(
                 label: Text(nivel),
                 selected: selected,
@@ -203,7 +233,7 @@ class RoutineFormView extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                onSelected: (_) => onNivelChanged(nivel),
+                onSelected: (_) => widget.onNivelChanged(nivel),
               );
             }).toList(),
           ),
@@ -224,7 +254,9 @@ class RoutineFormView extends StatelessWidget {
             spacing: 8,
             runSpacing: 10,
             children: AppConstants.gruposMusculares.map((grupo) {
-              final selected = gruposMuscularesSeleccionados.contains(grupo);
+              final selected = widget.gruposMuscularesSeleccionados.contains(
+                grupo,
+              );
               return FilterChip(
                 label: Text(grupo),
                 selected: selected,
@@ -244,7 +276,7 @@ class RoutineFormView extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                onSelected: (val) => onGrupoToggle(grupo, val),
+                onSelected: (val) => widget.onGrupoToggle(grupo, val),
               );
             }).toList(),
           ),
@@ -257,6 +289,7 @@ class RoutineFormView extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           TextField(
+            controller: _obsController,
             maxLines: 3,
             style: const TextStyle(color: AppColors.textPrimary),
             decoration: InputDecoration(
@@ -283,11 +316,7 @@ class RoutineFormView extends StatelessWidget {
                 borderSide: const BorderSide(color: AppColors.lightGreen),
               ),
             ),
-            onChanged: onObservacionesChanged,
-            controller: TextEditingController(text: observacionesEspeciales)
-              ..selection = TextSelection.collapsed(
-                offset: observacionesEspeciales.length,
-              ),
+            onChanged: widget.onObservacionesChanged,
           ),
           const SizedBox(height: 36),
 
@@ -298,7 +327,7 @@ class RoutineFormView extends StatelessWidget {
             child: ElevatedButton.icon(
               icon: const Icon(Icons.flash_on_rounded, size: 22),
               label: const Text('Generar rutinas con IA'),
-              onPressed: onGenerar,
+              onPressed: widget.onGenerar,
             ),
           ),
           const SizedBox(height: 20),

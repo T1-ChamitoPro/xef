@@ -1,5 +1,5 @@
 Deno.serve(async (req: Request) => {
-  // CORS
+  // CORS Headers
   if (req.method === 'OPTIONS') {
     return new Response('ok', {
       headers: {
@@ -25,40 +25,51 @@ Deno.serve(async (req: Request) => {
       throw new Error('RUTINA_API_KEY no está configurada en los secrets de Supabase')
     }
 
-    const prompt = `
-      Eres un entrenador personal profesional certificado.
+    // Inyección de aleatoriedad para evitar resultados idénticos en llamadas seguidas
+    const randomSeed = Math.random().toString(36).substring(7)
+    const tieneObservaciones = observaciones && observaciones.trim().length > 0
 
-      Genera exactamente 2 opciones de rutinas de ejercicio distintas y realistas según estos datos:
-      - Días de entrenamiento: ${JSON.stringify(dias)}
-      - Modalidad: ${modalidad || 'gimnasio'}
-      - Objetivo: ${objetivo || 'salud general'}
+    const prompt = `
+      Eres un Entrenador Personal de Élite y Especialista en Biomecánica y Rehabilitación Deportiva.
+
+      Tu tarea es generar exactamente 3 propuestas de rutinas de ejercicio COMPLETAMENTE DIVERSIFICADAS y realistas según la siguiente información:
+
+      DATOS DE ENTRADA:
+      - Días solicitados: ${JSON.stringify(dias)}
+      - Modalidad: ${modalidad || 'Gimnasio Tradicional'}
+      - Objetivo: ${objetivo || 'Hipertrofia Muscular'}
       - Nivel de experiencia: ${nivel || 'Intermedio'}
       - Grupos musculares a priorizar: ${JSON.stringify(grupos_musculares || [])}
-      - Observaciones especiales del usuario: ${observaciones || 'Ninguna'}
+      - OBSERVACIONES Y LESIONES (CRÍTICO): "${observaciones || 'Ninguna'}"
+      - Variador aleatorio de sesión: ${randomSeed}
 
-      Devuelve ÚNICAMENTE un array JSON válido (sin markdown ni texto extra) con este formato exacto:
+      REGLAS STRICTAS OBLIGATORIAS:
+      1. OBSERVACIONES E INCAPACIDADES (REGLA DE ORO):
+         ${tieneObservaciones 
+            ? `EL USUARIO HA INDICADO: "${observaciones}". Si menciona una lesión, molestia, falta de equipo o limitación (ej: dolor de rodilla, sin pesas, hernia, sin impacto), ESTÁ ABSOLUTAMENTE PROHIBIDO incluir ejercicios que estresen esa zona o requieran ese equipo. Sustitúyelos obligatoriamente por alternativas seguras.`
+            : 'Sin limitaciones reportadas, aplica ejercicios estándares para la modalidad.'}
 
+      2. DIVERSIFICACIÓN Y NO REPETICIÓN:
+         - Genera exactamente 3 opciones distintas (Opción 1: Enfoque Clásico/Fuerza, Opción 2: Variación Dinámica/Volumen, Opción 3: Enfoque Funcional/Rango Completo).
+         - Utiliza diferentes combinaciones de ejercicios, ángulos de trabajo y esquemas de series/repeticiones entre las opciones.
+
+      3. GRUPOS MUSCULARES Y DÍAS:
+         - Asegúrate de dar mayor volumen de trabajo a los grupos: ${JSON.stringify(grupos_musculares || [])}.
+         - Genera la lista de ejercicios para CADA UNO de los días enviados: ${JSON.stringify(dias)} (nombres de días estrictamente en MAYÚSCULAS).
+
+      FORMATO DE SALIDA EXCLUSIVO (Devuelve únicamente un JSON válido, sin bloques de markdown):
       [
         {
-          "titulo": "Nombre de la rutina",
-          "descripcion": "Breve explicación de la estrategia",
+          "titulo": "Título técnico y atractivo de la opción",
+          "descripcion": "Breve explicación de cómo se adaptan los ejercicios para cumplir los objetivos y respetar las limitaciones/lesiones expresadas.",
           "ejercicios": {
-            "LUNES": [
-              "Ejercicio 1 4x10",
-              "Ejercicio 2 3x12"
+            "${dias[0] || 'LUNES'}": [
+              "Nombre del ejercicio 4 x 10-12 reps",
+              "Nombre del segundo ejercicio 3 x 12 reps"
             ]
           }
         }
       ]
-
-      Reglas importantes:
-      - Genera exactamente 2 planes diferentes.
-      - Incluye TODOS los días recibidos (nombres en MAYÚSCULAS).
-      - Prioriza los grupos musculares indicados.
-      - Adapta volumen e intensidad al nivel (${nivel || 'Intermedio'}).
-      - Respeta las observaciones especiales del usuario.
-      - Cada ejercicio debe ir con series x repeticiones (o tiempo).
-      - No agregues texto fuera del JSON.
     `
 
     const response = await fetch(
@@ -70,7 +81,8 @@ Deno.serve(async (req: Request) => {
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             responseMimeType: 'application/json',
-            temperature: 0.75,
+            temperature: 0.9,
+            topP: 0.95,
           },
         }),
       }
