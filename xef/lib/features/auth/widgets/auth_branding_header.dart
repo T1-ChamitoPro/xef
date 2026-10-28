@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_theme.dart';
 
-/// Encabezado con el distintivo de marca XEF y eslogan
 class AuthBrandingHeader extends StatelessWidget {
   const AuthBrandingHeader({super.key});
 
@@ -10,10 +10,7 @@ class AuthBrandingHeader extends StatelessWidget {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 8,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: AppColors.lightGreen,
             borderRadius: BorderRadius.circular(12),

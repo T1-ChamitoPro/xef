@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
-/// Tarjeta seleccionable estilizada con animaciones suaves para objetivos, estilos de vida y modalidades.
 class SelectableCard extends StatelessWidget {
   final String label;
   final bool isSelected;

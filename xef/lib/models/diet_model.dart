@@ -1,14 +1,9 @@
-/// Comidas correspondientes a un día específico
 class DietMealDay {
   final String? desayuno;
   final String? almuerzo;
   final String? cena;
 
-  const DietMealDay({
-    this.desayuno,
-    this.almuerzo,
-    this.cena,
-  });
+  const DietMealDay({this.desayuno, this.almuerzo, this.cena});
 
   factory DietMealDay.fromMap(Map<String, dynamic>? map) {
     if (map == null) return const DietMealDay();
@@ -20,15 +15,10 @@ class DietMealDay {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'desayuno': desayuno,
-      'almuerzo': almuerzo,
-      'cena': cena,
-    };
+    return {'desayuno': desayuno, 'almuerzo': almuerzo, 'cena': cena};
   }
 }
 
-/// Modelo para una sugerencia o plan de dieta de IA
 class DietSuggestion {
   final String titulo;
   final String descripcion;
@@ -46,8 +36,9 @@ class DietSuggestion {
 
     for (final entry in rawMenu.entries) {
       if (entry.value is Map) {
-        parsedMenu[entry.key.toString().toUpperCase()] =
-            DietMealDay.fromMap(Map<String, dynamic>.from(entry.value as Map));
+        parsedMenu[entry.key.toString().toUpperCase()] = DietMealDay.fromMap(
+          Map<String, dynamic>.from(entry.value as Map),
+        );
       }
     }
 
@@ -59,7 +50,6 @@ class DietSuggestion {
   }
 }
 
-/// Modelo completo para una Dieta guardada en la base de datos
 class DietModel {
   final dynamic id;
   final String usuarioId;
@@ -90,8 +80,9 @@ class DietModel {
 
     for (final entry in rawMenu.entries) {
       if (entry.value is Map) {
-        parsedMenu[entry.key.toString().toUpperCase()] =
-            DietMealDay.fromMap(Map<String, dynamic>.from(entry.value as Map));
+        parsedMenu[entry.key.toString().toUpperCase()] = DietMealDay.fromMap(
+          Map<String, dynamic>.from(entry.value as Map),
+        );
       }
     }
 
@@ -108,7 +99,6 @@ class DietModel {
     );
   }
 
-  /// Retorna las comidas para un día específico
   DietMealDay? getMenuDelDia(String dia) {
     return menu[dia.toUpperCase()];
   }

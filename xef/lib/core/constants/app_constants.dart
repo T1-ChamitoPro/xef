@@ -1,8 +1,6 @@
-/// Constantes globales utilizadas en las diferentes características de XEF.
 class AppConstants {
   AppConstants._();
 
-  /// Días de la semana estándar
   static const List<String> diasSemana = [
     'LUNES',
     'MARTES',
@@ -13,7 +11,6 @@ class AppConstants {
     'DOMINGO',
   ];
 
-  /// Objetivos nutricionales para dietas
   static const List<String> objetivosNutricionales = [
     'BIENESTAR GENERAL',
     'PERDIDA DE PESO',
@@ -21,7 +18,6 @@ class AppConstants {
     'MANTENIMIENTO',
   ];
 
-  /// Estilos de vida / Nivel de actividad física
   static const List<String> estilosVida = ['SEDENTARIO', 'MODERADO', 'ACTIVO'];
 
   /// Tipos de alimentación
@@ -32,7 +28,6 @@ class AppConstants {
     'HIPERPROTEICA',
   ];
 
-  /// Intolerancias y restricciones comunes
   static const List<String> intolerancias = [
     'LACTOSA',
     'MANI',
@@ -41,7 +36,6 @@ class AppConstants {
     'MARISCOS',
   ];
 
-  /// Modalidades de entrenamiento para rutinas
   static const List<String> modalidadesRutina = [
     'Gimnasio Tradicional',
     'Calistenia / Peso Corporal',
@@ -51,7 +45,6 @@ class AppConstants {
     'Pilates / Movilidad',
   ];
 
-  /// Objetivos de entrenamiento
   static const List<String> objetivosRutina = [
     'Hipertrofia Muscular',
     'Perdida de Grasa / Definicion',
@@ -61,7 +54,6 @@ class AppConstants {
     'Recomposicion Corporal',
   ];
 
-  /// Grupos musculares a priorizar
   static const List<String> gruposMusculares = [
     'Pecho',
     'Espalda',
@@ -75,14 +67,12 @@ class AppConstants {
     'Core / Abdomen',
   ];
 
-  /// Niveles de experiencia
   static const List<String> nivelesExperiencia = [
     'Principiante',
     'Intermedio',
     'Avanzado',
   ];
 
-  /// Sugerencias rápidas para recetas
   static const List<String> sugerenciasRecetas = [
     'Pechuga a la plancha',
     'Ensalada Cítrica',
@@ -91,6 +81,5 @@ class AppConstants {
     'Pollo al curry',
   ];
 
-  /// Opciones de sexo biológico para perfil
   static const List<String> opcionesSexo = ['MASCULINO', 'FEMENINO', 'OTRO'];
 }

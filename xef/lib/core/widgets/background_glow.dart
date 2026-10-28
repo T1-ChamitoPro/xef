@@ -1,8 +1,9 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
-/// Widget reutilizable que proyecta un resplandor ambiental orgánico en el fondo de las pantallas.
 class BackgroundGlow extends StatelessWidget {
   final double topOffsetRatio;
   final double rightOffsetRatio;

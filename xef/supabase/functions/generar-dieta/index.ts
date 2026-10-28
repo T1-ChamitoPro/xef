@@ -20,8 +20,8 @@ Deno.serve(async (req: Request) => {
       })
     }
 
-    const RUTINA_API_KEY = Deno.env.get('RUTINA_API_KEY')
-    if (!RUTINA_API_KEY) {
+    const GEMINI_API_KEY= Deno.env.get('GEMINI_API_KEY')
+    if (!GEMINI_API_KEY) {
       throw new Error('RUTINA_API_KEY no está configurada en los secrets de Supabase')
     }
 
@@ -78,7 +78,7 @@ Reglas importantes:
 `
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${RUTINA_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
