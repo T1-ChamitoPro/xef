@@ -73,8 +73,8 @@ class DashboardScreen extends StatelessWidget {
 
     final diaSemana = AppDateUtils.getDiaActual();
     final tienePlan =
-        dietProvider.dietaActiva != null ||
-        routineProvider.rutinaActiva != null;
+        dietProvider.todasLasDietas.isNotEmpty ||
+        routineProvider.todasLasRutinas.isNotEmpty;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -88,8 +88,6 @@ class DashboardScreen extends StatelessWidget {
               onRefresh: () async {
                 await Future.wait([
                   authProvider.cargarPerfil(),
-                  dietProvider.cargarDietaActiva(),
-                  routineProvider.cargarRutinaActiva(),
                   historialProvider.cargarHistorialHoy(),
                   dietProvider.cargarTodasLasDietas(),
                   routineProvider.cargarTodasLasRutinas(),
@@ -156,14 +154,14 @@ class DashboardScreen extends StatelessWidget {
 
                     // Dieta del día
                     ActiveDietCard(
-                      dietaActiva: dietProvider.getDietaParaDia(diaSemana),
+                      dieta: dietProvider.getDietaParaDia(diaSemana),
                       diaSemana: diaSemana,
                     ),
                     const SizedBox(height: 20),
 
                     // Rutina del día
                     ActiveRoutineCard(
-                      rutinaActiva: routineProvider.getRutinaParaDia(diaSemana),
+                      rutina: routineProvider.getRutinaParaDia(diaSemana),
                       diaSemana: diaSemana,
                     ),
 

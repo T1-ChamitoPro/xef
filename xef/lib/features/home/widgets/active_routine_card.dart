@@ -8,13 +8,13 @@ import '../../../models/routine_model.dart';
 import '../../../providers/historial_provider.dart';
 
 class ActiveRoutineCard extends StatelessWidget {
-  final RoutineModel? rutinaActiva;
+  final RoutineModel? rutina;
   final String diaSemana;
   final VoidCallback? onDelete;
 
   const ActiveRoutineCard({
     super.key,
-    required this.rutinaActiva,
+    required this.rutina,
     required this.diaSemana,
     this.onDelete,
   });
@@ -41,7 +41,7 @@ class ActiveRoutineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ejerciciosHoy = rutinaActiva?.getEjerciciosDelDia(diaSemana) ?? [];
+    final ejerciciosHoy = rutina?.getEjerciciosDelDia(diaSemana) ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,8 +49,8 @@ class ActiveRoutineCard extends StatelessWidget {
         SectionHeader(
           title: 'Rutina de hoy',
           icon: Icons.fitness_center_rounded,
-          onDelete: rutinaActiva != null ? onDelete : null,
-          badgeText: rutinaActiva?.nombre,
+          onDelete: rutina != null ? onDelete : null,
+          badgeText: rutina?.nombre,
         ),
         const SizedBox(height: 12),
         Container(
@@ -63,7 +63,7 @@ class ActiveRoutineCard extends StatelessWidget {
               color: AppColors.azureMist.withValues(alpha: 0.08),
             ),
           ),
-          child: rutinaActiva != null && ejerciciosHoy.isNotEmpty
+          child: rutina != null && ejerciciosHoy.isNotEmpty
               ? Consumer<HistorialProvider>(
                   builder: (context, historialProvider, _) {
                     return Column(
@@ -72,7 +72,7 @@ class ActiveRoutineCard extends StatelessWidget {
                             .isEjercicioCompletado(ej);
 
                         return InkWell(
-                          splashColor: Colors.transparent, // Sin bloom blanco
+                          splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
                           onTap: () {

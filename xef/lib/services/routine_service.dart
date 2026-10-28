@@ -7,22 +7,6 @@ import '../models/routine_model.dart';
 class RoutineService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  Future<RoutineModel?> obtenerRutinaActiva() async {
-    final userId = _supabase.auth.currentUser?.id;
-    if (userId == null) return null;
-
-    final data = await _supabase
-        .from('rutina')
-        .select()
-        .eq('usuario_id', userId)
-        .order('id', ascending: false)
-        .limit(1)
-        .maybeSingle();
-
-    if (data == null) return null;
-    return RoutineModel.fromMap(data);
-  }
-
   Future<void> guardarRutina({
     required String nombre,
     required List<String> diasSemana,
