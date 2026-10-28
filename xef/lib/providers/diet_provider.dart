@@ -225,4 +225,25 @@ class DietProvider extends ChangeNotifier {
       return null;
     }
   }
+
+  /// Elimina una dieta por su ID (funciona para cualquier dieta, no solo la activa)
+  Future<bool> eliminarDietaPorId(dynamic id) async {
+    try {
+      await _dietService.eliminarDieta(id);
+
+      // Si era la activa, la limpiamos
+      if (_dietaActiva?.id == id) {
+        _dietaActiva = null;
+      }
+
+      // La quitamos de la lista
+      _todasLasDietas.removeWhere((d) => d.id == id);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Error al eliminar dieta: $e';
+      notifyListeners();
+      return false;
+    }
+  }
 }

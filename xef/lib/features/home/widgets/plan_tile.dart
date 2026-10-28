@@ -83,7 +83,7 @@ class PlanTile extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text(
-                      'ACTIVA',
+                      'HOY',
                       style: TextStyle(
                         color: AppColors.lightGreen,
                         fontSize: 10,

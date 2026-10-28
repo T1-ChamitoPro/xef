@@ -4,6 +4,7 @@ import 'package:xef/features/home/widgets/detail_diet_sheet.dart';
 import 'package:xef/features/home/widgets/detail_routine_sheet.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/date_utils.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../models/diet_model.dart';
 import '../../../models/routine_model.dart';
@@ -47,12 +48,16 @@ class MyPlansSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           ...dietas.map((dieta) {
-            final esActiva = dietProvider.dietaActiva?.id == dieta.id;
+            final diaHoy = AppDateUtils.getDiaActual().toUpperCase();
+            final esDeHoy = dieta.diasSemana.any(
+              (d) => d.toUpperCase() == diaHoy,
+            );
+
             return PlanTile(
               titulo: dieta.nombre,
               subtitulo: dieta.diasSemana.join(' • '),
               icon: Icons.restaurant_menu_rounded,
-              esActiva: esActiva,
+              esActiva: esDeHoy, // ← ahora es "es de hoy"
               onTap: () => _mostrarDetalleDieta(context, dieta),
             );
           }),
@@ -71,12 +76,16 @@ class MyPlansSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           ...rutinas.map((rutina) {
-            final esActiva = routineProvider.rutinaActiva?.id == rutina.id;
+            final diaHoy = AppDateUtils.getDiaActual().toUpperCase();
+            final esDeHoy = rutina.diasSemana.any(
+              (d) => d.toUpperCase() == diaHoy,
+            );
+
             return PlanTile(
               titulo: rutina.nombre,
               subtitulo: rutina.diasSemana.join(' • '),
               icon: Icons.fitness_center_rounded,
-              esActiva: esActiva,
+              esActiva: esDeHoy, // ← ahora es "es de hoy"
               onTap: () => _mostrarDetalleRutina(context, rutina),
             );
           }),

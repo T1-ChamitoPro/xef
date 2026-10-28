@@ -216,4 +216,23 @@ class RoutineProvider extends ChangeNotifier {
       return null;
     }
   }
+
+  /// Elimina una rutina por su ID (funciona para cualquier rutina, no solo la activa)
+  Future<bool> eliminarRutinaPorId(dynamic id) async {
+    try {
+      await _routineService.eliminarRutina(id);
+
+      if (_rutinaActiva?.id == id) {
+        _rutinaActiva = null;
+      }
+
+      _todasLasRutinas.removeWhere((r) => r.id == id);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = 'Error al eliminar rutina: $e';
+      notifyListeners();
+      return false;
+    }
+  }
 }
