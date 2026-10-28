@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/background_glow.dart';
 import '../../../models/recipe_model.dart';
 import '../../../providers/recipe_provider.dart';
@@ -17,7 +18,6 @@ class RecipeDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final double bottomPadding = MediaQuery.of(context).padding.bottom + 100.0;
 
-    // Extracción de datos nutricionales con fallback seguro
     final Map<String, dynamic>? info = receta.infoNutricional;
     final int calorias = (info?['calorias'] as num?)?.toInt() ?? 0;
     final double proteinas = (info?['proteinas_g'] as num?)?.toDouble() ?? 0.0;
@@ -42,15 +42,11 @@ class RecipeDetailScreen extends StatelessWidget {
                 onPressed: () async {
                   await recipeProvider.toggleFavorita(receta);
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          esFav
-                              ? 'Receta eliminada de guardadas'
-                              : '¡Receta guardada en la base de datos!',
-                        ),
-                        backgroundColor: AppColors.lightGreen,
-                      ),
+                    showAppSnackBar(
+                      context,
+                      message: esFav
+                          ? 'Receta eliminada de guardadas'
+                          : '¡Receta guardada correctamente!',
                     );
                   }
                 },
@@ -81,7 +77,6 @@ class RecipeDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Tarjeta Header con Información General y Desglose Nutricional
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(18),
@@ -153,7 +148,6 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                         const Divider(height: 24, color: Colors.white10),
 
-                        // --- SECCIÓN DE DESGLOSE NUTRICIONAL VISUAL ---
                         const Text(
                           'Aporte Nutricional',
                           style: TextStyle(
@@ -199,13 +193,11 @@ class RecipeDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // Sección de Ingredientes
                   if (receta.ingredientes.isNotEmpty) ...[
                     RecipeIngredientsSection(ingredientes: receta.ingredientes),
                     const SizedBox(height: 24),
                   ],
 
-                  // Sección de Paso a Paso
                   RecipeStepsSection(pasos: receta.pasos),
                 ],
               ),

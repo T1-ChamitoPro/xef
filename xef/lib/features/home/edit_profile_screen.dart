@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_snack_bar.dart';
 import '../../core/widgets/background_glow.dart';
 import '../../providers/auth_provider.dart';
 
@@ -65,22 +66,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (!mounted) return;
 
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Datos guardados con éxito!'),
-          backgroundColor: AppColors.lightGreen,
-        ),
-      );
+      showAppSnackBar(context, message: '¡Datos guardados con éxito!');
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
+      showAppSnackBar(
+        context,
+        message:
             authProvider.errorMessage ??
-                'Error al actualizar en la base de datos.',
-          ),
-          backgroundColor: Colors.redAccent,
-        ),
+            'Error al actualizar en la base de datos.',
+        isError: true,
       );
     }
   }
