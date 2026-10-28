@@ -62,7 +62,7 @@ class ActiveDietCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionHeader(
-          title: 'Dieta activa',
+          title: 'Dieta de hoy',
           icon: Icons.restaurant_menu_rounded,
           badgeText: dietaActiva?.nombre,
           onDelete: dietaActiva != null ? onDelete : null,
@@ -121,7 +121,7 @@ class ActiveDietCard extends StatelessWidget {
                       ),
                       SizedBox(width: 10),
                       Text(
-                        'No tienes una dieta activa.',
+                        'No tienes una dieta para hoy.',
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14,
@@ -172,8 +172,8 @@ class ActiveDietCard extends StatelessWidget {
     final completado = historialProvider.isComidaCompletada(tipo, plato);
 
     return InkWell(
-      splashColor: Colors.transparent, // Elimina la onda blanca
-      highlightColor: Colors.transparent, // Elimina el destello retenido
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       borderRadius: BorderRadius.circular(10),
       onTap: () {
         historialProvider.toggleComida(_crearHistorialComida(tipo, plato));

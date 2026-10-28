@@ -188,21 +188,20 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    // Dieta activa
+                    // Dieta del día
                     ActiveDietCard(
-                      dietaActiva: dietProvider.dietaActiva,
+                      dietaActiva: dietProvider.getDietaParaDia(diaSemana),
                       diaSemana: diaSemana,
                       onDelete: () => _eliminarDieta(context),
                     ),
                     const SizedBox(height: 20),
 
-                    // Rutina activa
+                    // Rutina del día
                     ActiveRoutineCard(
-                      rutinaActiva: routineProvider.rutinaActiva,
+                      rutinaActiva: routineProvider.getRutinaParaDia(diaSemana),
                       diaSemana: diaSemana,
                       onDelete: () => _eliminarRutina(context),
                     ),
-                    const SizedBox(height: 28),
 
                     const SizedBox(height: 12),
                     const MyPlansSection(),

@@ -32,7 +32,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       text: perfil?.alturaCm.toString() ?? '',
     );
 
-    final sexoRaw = perfil?.sexo?.trim().toLowerCase() ?? 'masculino';
+    final sexoRaw = perfil?.sexo.trim().toLowerCase() ?? 'masculino';
     if (sexoRaw == 'femenino') {
       _sexo = 'Femenino';
     } else {
