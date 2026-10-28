@@ -48,7 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!success && mounted && authProvider.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al iniciar sesión: ${authProvider.errorMessage}'),
+          content: Text(
+            'Error al iniciar sesión: ${authProvider.errorMessage}',
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -148,7 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 32),
 
-                        // Botón de Iniciar Sesión conectado con AuthProvider
                         SizedBox(
                           width: double.infinity,
                           height: 56,
@@ -184,7 +185,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const Spacer(),
 
-                        // Enlace a Registro
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

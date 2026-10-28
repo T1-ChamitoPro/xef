@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
-/// Vista de carga estilizada para operaciones de generación con Inteligencia Artificial.
 class AILoadingView extends StatelessWidget {
   final String title;
   final String description;

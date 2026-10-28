@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
 
-/// Selector desplegable para el sexo biológico.
 class GenderSelector extends StatelessWidget {
   final String selectedValue;
   final ValueChanged<String> onChanged;
@@ -16,10 +15,8 @@ class GenderSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Elimina opciones duplicadas para evitar errores de Flutter.
     final opciones = AppConstants.opcionesSexo.toSet().toList();
 
-    // Busca el valor real de la lista sin distinguir mayúsculas.
     String? valorSeleccionado;
 
     for (final opcion in opciones) {

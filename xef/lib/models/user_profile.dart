@@ -31,14 +31,11 @@ class UserProfile {
     );
   }
 
-
-  /// Primer nombre para saludos amigables
   String get primerNombre {
     if (nombre.trim().isEmpty) return 'Usuario';
     return nombre.trim().split(' ').first;
   }
 
-  /// Inicial para el avatar de usuario
   String get inicial {
     if (nombre.trim().isNotEmpty) {
       return nombre.trim()[0].toUpperCase();
@@ -46,17 +43,14 @@ class UserProfile {
     return 'U';
   }
 
-  /// Cálculo del Índice de Masa Corporal (IMC)
   double get imc {
     if (alturaCm <= 0) return 0.0;
     final alturaMetros = alturaCm / 100.0;
     return pesoKg / (alturaMetros * alturaMetros);
   }
 
-  /// IMC formateado con un decimal
   String get imcString => imc.toStringAsFixed(1);
 
-  /// Estado o categoría de salud según IMC
   String get categoriaImc {
     if (imc < 18.5) return 'Bajo peso';
     if (imc < 25.0) return 'Saludable';

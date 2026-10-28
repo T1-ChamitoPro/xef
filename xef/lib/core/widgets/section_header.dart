@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
-/// Encabezado estándar para secciones en Dashboard, Dietas, Rutinas y Recetas.
 class SectionHeader extends StatelessWidget {
   final String title;
   final IconData icon;

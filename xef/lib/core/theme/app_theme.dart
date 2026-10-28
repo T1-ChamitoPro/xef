@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Paleta oficial de XEF: carbón oscuro y verde lima.
 abstract class AppColors {
-  // Colores base inspirados en el logo y el splash de XEF.
+  // Colores base.
   static const Color azureMist = Color(0xFFEAF0E8);
   static const Color lightGreen = Color(0xFFA6FF00);
   static const Color sageGreen = Color(0xFF78A832);
   static const Color oliveLeaf = Color(0xFF202522);
   static const Color charcoalBrown = Color(0xFF080909);
 
-  // Mapeo semántico: se conservan los nombres para evitar romper referencias.
+  // Mapeo semántico
   static const Color background = charcoalBrown;
   static const Color surface = Color(0xFF101112);
   static const Color cardBg = Color(0xFF17191A);
@@ -26,8 +25,6 @@ abstract class AppColors {
   static const Color errorRed = Color(0xFFFF6B6B);
   static const Color successGreen = lightGreen;
 
-  // Se mantiene disponible para widgets que usen AppColors.dayTitleStyle.
-  // Sin glow, para respetar la identidad limpia del splash.
   static TextStyle dayTitleStyle = const TextStyle(
     fontSize: 46,
     fontWeight: FontWeight.w800,
@@ -38,7 +35,6 @@ abstract class AppColors {
 }
 
 class AppTheme {
-  // Se conserva el getter público para no romper widgets existentes.
   static TextStyle get dayTitleStyle => const TextStyle(
     fontSize: 46,
     fontWeight: FontWeight.w800,
@@ -98,7 +94,7 @@ class AppTheme {
         ),
       ),
 
-      // Tarjetas oscuras con borde discreto, sin efectos luminosos.
+      // Tarjetas
       cardTheme: CardThemeData(
         color: AppColors.cardBg,
         elevation: 0,

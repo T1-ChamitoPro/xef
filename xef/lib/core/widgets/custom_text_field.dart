@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
-/// Campo de texto elegante reutilizable con soporte para iconos, validación y ocultamiento de contraseña.
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
@@ -32,9 +32,7 @@ class CustomTextField extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.azureMist.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.azureMist.withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: AppColors.azureMist.withValues(alpha: 0.08)),
       ),
       child: TextFormField(
         controller: controller,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
-/// Muestra un diálogo de confirmación estilizado acorde a la paleta de XEF.
 Future<bool?> showAppConfirmationDialog({
   required BuildContext context,
   required String title,

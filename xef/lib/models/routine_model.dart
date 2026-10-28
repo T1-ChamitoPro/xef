@@ -1,4 +1,3 @@
-/// Modelo para una sugerencia de rutina de entrenamiento generada por IA
 class RoutineSuggestion {
   final String titulo;
   final String descripcion;
@@ -16,8 +15,9 @@ class RoutineSuggestion {
 
     for (final entry in rawEjercicios.entries) {
       if (entry.value is List) {
-        parsed[entry.key.toString().toUpperCase()] =
-            List<String>.from((entry.value as List).map((e) => e.toString()));
+        parsed[entry.key.toString().toUpperCase()] = List<String>.from(
+          (entry.value as List).map((e) => e.toString()),
+        );
       }
     }
 
@@ -29,7 +29,6 @@ class RoutineSuggestion {
   }
 }
 
-/// Modelo completo para una Rutina guardada en la base de datos
 class RoutineModel {
   final dynamic id;
   final String usuarioId;
@@ -60,8 +59,9 @@ class RoutineModel {
 
     for (final entry in rawEjercicios.entries) {
       if (entry.value is List) {
-        parsed[entry.key.toString().toUpperCase()] =
-            List<String>.from((entry.value as List).map((e) => e.toString()));
+        parsed[entry.key.toString().toUpperCase()] = List<String>.from(
+          (entry.value as List).map((e) => e.toString()),
+        );
       }
     }
 
@@ -78,7 +78,6 @@ class RoutineModel {
     );
   }
 
-  /// Retorna los ejercicios para un día específico
   List<String> getEjerciciosDelDia(String dia) {
     final key = ejercicios.keys.firstWhere(
       (k) => k.toUpperCase() == dia.toUpperCase(),
