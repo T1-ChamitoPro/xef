@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/section_header.dart';
@@ -212,31 +213,70 @@ class DietFormView extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: AppConstants.intolerancias.map((item) {
-              final selected = intoleranciasSeleccionadas.contains(item);
-              return FilterChip(
-                label: Text(
-                  item,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: selected ? Colors.white : AppColors.textPrimary,
+            children: [
+              // Chips estáticos
+              ...AppConstants.intolerancias.map((item) {
+                final selected = intoleranciasSeleccionadas.contains(item);
+                return FilterChip(
+                  label: Text(
+                    item,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: selected ? Colors.white : AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                selected: selected,
-                selectedColor: AppColors.errorRed.withValues(alpha: 0.8),
-                backgroundColor: AppColors.azureMist.withValues(alpha: 0.05),
-                side: BorderSide(
-                  color: selected
-                      ? AppColors.errorRed
-                      : AppColors.azureMist.withValues(alpha: 0.12),
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                onSelected: (val) => onIntoleranciaToggle(item, val),
-              );
-            }).toList(),
+                  selected: selected,
+                  selectedColor: AppColors.errorRed.withValues(alpha: 0.8),
+                  backgroundColor: AppColors.azureMist.withValues(alpha: 0.05),
+                  side: BorderSide(
+                    color: selected
+                        ? AppColors.errorRed
+                        : AppColors.azureMist.withValues(alpha: 0.12),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  onSelected: (val) => onIntoleranciaToggle(item, val),
+                );
+              }),
+
+              // Chips personalizados
+              ...intoleranciasSeleccionadas
+                  .where((item) => !AppConstants.intolerancias.contains(item))
+                  .map((item) {
+                    return FilterChip(
+                      label: Text(
+                        item,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      selected: true,
+                      selectedColor: AppColors.errorRed.withValues(alpha: 0.8),
+                      deleteIcon: const Icon(
+                        Icons.close,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                      onDeleted: () => onIntoleranciaToggle(item, false),
+                      onSelected: (_) {},
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    );
+                  }),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Campo para agregar intolerancia personalizada
+          _CustomIntoleranceInput(
+            onAdd: (value) {
+              onIntoleranciaToggle(value.toUpperCase(), true);
+            },
           ),
           const SizedBox(height: 36),
 
@@ -253,6 +293,95 @@ class DietFormView extends StatelessWidget {
           const SizedBox(height: 20),
         ],
       ),
+    );
+  }
+}
+
+class _CustomIntoleranceInput extends StatefulWidget {
+  final ValueChanged<String> onAdd;
+
+  const _CustomIntoleranceInput({required this.onAdd});
+
+  @override
+  State<_CustomIntoleranceInput> createState() =>
+      _CustomIntoleranceInputState();
+}
+
+class _CustomIntoleranceInputState extends State<_CustomIntoleranceInput> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _agregar() {
+    final texto = _controller.text.trim();
+    if (texto.isEmpty) return;
+
+    widget.onAdd(texto);
+    _controller.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _controller,
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+            decoration: InputDecoration(
+              hintText: 'Otra intolerancia (ej: soya, huevo...)',
+              hintStyle: TextStyle(
+                color: AppColors.textSecondary.withValues(alpha: 0.6),
+                fontSize: 13,
+              ),
+              filled: true,
+              fillColor: AppColors.azureMist.withValues(alpha: 0.05),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: AppColors.azureMist.withValues(alpha: 0.12),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: AppColors.azureMist.withValues(alpha: 0.12),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: AppColors.lightGreen),
+              ),
+            ),
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _agregar(),
+          ),
+        ),
+        const SizedBox(width: 10),
+        SizedBox(
+          height: 48,
+          child: ElevatedButton(
+            onPressed: _agregar,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.lightGreen,
+              foregroundColor: AppColors.textDark,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+            ),
+            child: const Icon(Icons.add_rounded, size: 22),
+          ),
+        ),
+      ],
     );
   }
 }
