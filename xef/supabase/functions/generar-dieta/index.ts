@@ -11,7 +11,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json()
-    const { dias, modalidad, objetivo } = body
+    const { dias, objetivo, estiloVida, tipoDieta, intolerancias } = body
 
     if (!dias || !Array.isArray(dias) || dias.length === 0) {
       return new Response(JSON.stringify({ error: 'Falta el parámetro "dias"' }), {
@@ -20,65 +20,65 @@ Deno.serve(async (req: Request) => {
       })
     }
 
-    const GEMINI_API_KEY= Deno.env.get('GEMINI_API_KEY')
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
     if (!GEMINI_API_KEY) {
-      throw new Error('RUTINA_API_KEY no está configurada en los secrets de Supabase')
+      throw new Error('GEMINI_API_KEY no está configurada en los secrets de Supabase')
     }
 
     const prompt = `
-Eres un entrenador personal profesional certificado.
+Eres un nutricionista profesional certificado con amplia experiencia en planes alimenticios personalizados.
 
-Genera exactamente 2 opciones de rutinas de ejercicio distintas y realistas según estos datos:
-- Días de entrenamiento: ${JSON.stringify(dias)}
-- Modalidad: ${modalidad || 'gimnasio'}
-- Objetivo: ${objetivo || 'salud general'}
+Genera exactamente 2 opciones de dietas distintas y realistas según estos datos del usuario:
+- Días a cubrir: ${JSON.stringify(dias)}
+- Objetivo nutricional: ${objetivo || 'BIENESTAR GENERAL'}
+- Estilo de vida: ${estiloVida || 'SEDENTARIO'}
+- Tipo de dieta: ${tipoDieta || 'BALANCEADA'}
+- Intolerancias / Alergias (NO incluir estos alimentos): ${JSON.stringify(intolerancias || [])}
 
 Devuelve ÚNICAMENTE un array JSON válido (sin markdown ni texto extra) con este formato exacto:
 
 [
   {
-    "titulo": "Rutina Full Body Principiante",
-    "descripcion": "Enfocada en construir base de fuerza y técnica con ejercicios compuestos.",
-    "ejercicios": {
-      "LUNES": [
-        "Sentadilla con peso corporal 3x12",
-        "Flexiones de pecho 3x10",
-        "Remo con banda 3x12",
-        "Plancha 3x30 segundos"
-      ],
-      "MIÉRCOLES": [
-        "Peso muerto rumano con mancuernas 3x10",
-        "Press militar con mancuernas 3x10",
-        "Zancadas 3x10 por pierna",
-        "Elevaciones laterales 3x12"
-      ]
+    "titulo": "Plan Déficit Calórico Balanceado",
+    "descripcion": "Enfocado en pérdida de grasa con comidas fáciles de preparar y alta saciedad.",
+    "menu": {
+      "LUNES": {
+        "desayuno": "Avena con plátano y canela + café negro",
+        "almuerzo": "Pechuga de pollo a la plancha 150g + arroz integral + ensalada de tomate y pepino",
+        "cena": "Salmón al horno + brócoli al vapor + puré de calabaza"
+      },
+      "MIÉRCOLES": {
+        "desayuno": "...",
+        "almuerzo": "...",
+        "cena": "..."
+      }
     }
   },
   {
-    "titulo": "Rutina Hipertrofia Intermedia",
-    "descripcion": "Enfocada en volumen muscular y progresión de cargas.",
-    "ejercicios": {
-      "LUNES": [
-        "Sentadilla con barra 4x8",
-        "Press banca 4x8",
-        "Remo con barra 4x10",
-        "Fondos en paralelas 3x10"
-      ]
+    "titulo": "Plan Alto en Proteína",
+    "descripcion": "Diseñado para preservar masa muscular durante el déficit calórico.",
+    "menu": {
+      "LUNES": {
+        "desayuno": "...",
+        "almuerzo": "...",
+        "cena": "..."
+      }
     }
   }
 ]
 
 Reglas importantes:
 - Genera exactamente 2 planes diferentes.
-- Dentro de "ejercicios" incluye TODOS los días que te pasé (usa los nombres exactos en MAYÚSCULAS).
-- Cada día debe ser un array de strings con el formato: "Nombre del ejercicio series x repeticiones".
-- Adapta los ejercicios a la modalidad (${modalidad}) y al objetivo (${objetivo}).
-- Sé realista con el volumen según el nivel implícito del objetivo.
+- Dentro de "menu" incluye TODOS los días que te pasé (usa los nombres exactos en MAYÚSCULAS).
+- Cada día debe tener exactamente las claves: "desayuno", "almuerzo" y "cena".
+- Adapta las porciones y alimentos al objetivo (${objetivo}), estilo de vida (${estiloVida}) y tipo de dieta (${tipoDieta}).
+- Respeta estrictamente las intolerancias/alergias: no uses ninguno de estos alimentos: ${JSON.stringify(intolerancias || [])}.
+- Sé realista, práctico y variado.
 - No agregues ningún texto fuera del JSON.
 `
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -86,7 +86,7 @@ Reglas importantes:
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             responseMimeType: 'application/json',
-            temperature: 0.75,
+            temperature: 0.7,
           },
         }),
       }
@@ -105,8 +105,8 @@ Reglas importantes:
       throw new Error('Gemini no devolvió contenido válido')
     }
 
-    const rutinas = JSON.parse(textResult)
-    const resultado = Array.isArray(rutinas) ? rutinas : [rutinas]
+    const dietas = JSON.parse(textResult)
+    const resultado = Array.isArray(dietas) ? dietas : [dietas]
 
     return new Response(JSON.stringify(resultado), {
       headers: {
