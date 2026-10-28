@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:xef/features/home/widgets/my_plans_section.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/date_utils.dart';
@@ -65,8 +66,6 @@ class DashboardScreen extends StatelessWidget {
 
   Future<void> _registrarDia(BuildContext context) async {
     final historialProvider = context.read<HistorialProvider>();
-
-    // Aseguramos que el historial de hoy esté cargado antes de procesar la consolidación
     await historialProvider.cargarHistorialHoy();
 
     if (!context.mounted) return;
@@ -126,6 +125,8 @@ class DashboardScreen extends StatelessWidget {
                   dietProvider.cargarDietaActiva(),
                   routineProvider.cargarRutinaActiva(),
                   historialProvider.cargarHistorialHoy(),
+                  dietProvider.cargarTodasLasDietas(),
+                  routineProvider.cargarTodasLasRutinas(),
                 ]);
               },
               child: SingleChildScrollView(
@@ -201,6 +202,10 @@ class DashboardScreen extends StatelessWidget {
                       diaSemana: diaSemana,
                       onDelete: () => _eliminarRutina(context),
                     ),
+                    const SizedBox(height: 28),
+
+                    const SizedBox(height: 12),
+                    const MyPlansSection(),
                     const SizedBox(height: 28),
 
                     // ===== BOTÓN REGISTRAR DÍA EN HISTORIAL =====

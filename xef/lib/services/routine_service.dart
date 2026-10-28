@@ -4,11 +4,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/routine_model.dart';
 
-/// Servicio centralizado para gestionar rutinas de ejercicios (consultas, guardado, eliminación e IA).
 class RoutineService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// Obtiene la rutina activa más reciente del usuario
   Future<RoutineModel?> obtenerRutinaActiva() async {
     final userId = _supabase.auth.currentUser?.id;
     if (userId == null) return null;
@@ -25,7 +23,6 @@ class RoutineService {
     return RoutineModel.fromMap(data);
   }
 
-  /// Guarda una nueva rutina en Supabase
   Future<void> guardarRutina({
     required String nombre,
     required List<String> diasSemana,
@@ -52,12 +49,10 @@ class RoutineService {
     });
   }
 
-  /// Elimina una rutina por su identificador
   Future<void> eliminarRutina(dynamic rutinaId) async {
     await _supabase.from('rutina').delete().eq('id', rutinaId);
   }
 
-  /// Genera opciones de rutina con IA delegando a la Edge Function
   Future<List<RoutineSuggestion>> generarRutinasConIA({
     required List<String> dias,
     required String modalidad,
@@ -146,5 +141,20 @@ class RoutineService {
         },
       ),
     ];
+  }
+
+  Future<List<RoutineModel>> obtenerTodasLasRutinas() async {
+    final userId = _supabase.auth.currentUser?.id;
+    if (userId == null) return [];
+
+    final data = await _supabase
+        .from('rutina')
+        .select()
+        .eq('usuario_id', userId)
+        .order('id', ascending: false);
+
+    return (data as List)
+        .map((item) => RoutineModel.fromMap(Map<String, dynamic>.from(item)))
+        .toList();
   }
 }
