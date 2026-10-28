@@ -4,9 +4,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../models/historial_model.dart';
 import 'historial_comidas_section.dart';
 import 'historial_ejercicios_section.dart';
-import 'historial_resumen_nutricional_section.dart'; // <--- 1. Importar
+import 'historial_resumen_nutricional_section.dart';
 
-/// Tarjeta expandible que muestra el detalle de un día guardado en el historial
 class HistorialDiaCard extends StatelessWidget {
   final HistorialDia dia;
 
@@ -20,50 +19,68 @@ class HistorialDiaCard extends StatelessWidget {
     final numCalorias = dia.infoNutricionalResumen?['total_calorias'] ?? 0;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: AppColors.azureMist.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.azureMist.withValues(alpha: 0.08)),
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.azureMist.withValues(alpha: 0.1)),
       ),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        iconColor: AppColors.lightGreen,
-        collapsedIconColor: AppColors.textSecondary,
-        title: Text(
-          fechaFormatted,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        subtitle: Text(
-          '${dia.comidas.length} comidas | ${dia.ejercicios.length} ejercicios ($numCalorias kcal)',
-          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
-        ),
-        children: [
-          const Divider(height: 1, color: Colors.white10),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                HistorialComidasSection(comidas: dia.comidas),
-                const SizedBox(height: 16),
-                HistorialEjerciciosSection(ejercicios: dia.ejercicios),
-                const SizedBox(height: 20),
-                const Divider(color: Colors.white10),
-                const SizedBox(height: 12),
-                // 2. Nueva sección de resumen al final del día
-                HistorialResumenNutricionalSection(
-                  infoNutricional: dia.infoNutricionalResumen,
-                  infoFisica: dia.infoFisicaResumen,
-                ),
-              ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 6,
             ),
+            iconColor: AppColors.lightGreen,
+            collapsedIconColor: AppColors.textMuted,
+            title: Text(
+              fechaFormatted,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '${dia.comidas.length} comidas  •  ${dia.ejercicios.length} ejercicios  •  $numCalorias kcal',
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            children: [
+              Divider(
+                height: 1,
+                color: AppColors.azureMist.withValues(alpha: 0.1),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HistorialComidasSection(comidas: dia.comidas),
+                    const SizedBox(height: 18),
+                    HistorialEjerciciosSection(ejercicios: dia.ejercicios),
+                    const SizedBox(height: 20),
+                    Divider(color: AppColors.azureMist.withValues(alpha: 0.1)),
+                    const SizedBox(height: 16),
+                    HistorialResumenNutricionalSection(
+                      infoNutricional: dia.infoNutricionalResumen,
+                      infoFisica: dia.infoFisicaResumen,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

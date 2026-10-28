@@ -44,7 +44,6 @@ class HistorialProvider extends ChangeNotifier {
     }
   }
 
-  /// Comprueba si la comida específica ya está completada
   bool isComidaCompletada(String tipo, String nombreComida) {
     if (_historialHoy == null) return false;
     return _historialHoy!.comidas.any(
@@ -52,14 +51,12 @@ class HistorialProvider extends ChangeNotifier {
     );
   }
 
-  /// Alterna comida en la UI de inmediato y persiste en Supabase
   Future<void> toggleComida(HistorialComida comida) async {
     if (_historialHoy == null) return;
 
     final estaCompletada = isComidaCompletada(comida.tipoComida, comida.nombre);
     final listaOriginal = List<HistorialComida>.from(_historialHoy!.comidas);
 
-    // 1. Actualización optimista inmediata (0ms de retraso visual)
     if (estaCompletada) {
       _historialHoy!.comidas.removeWhere(
         (c) => c.tipoComida == comida.tipoComida && c.nombre == comida.nombre,
@@ -72,7 +69,6 @@ class HistorialProvider extends ChangeNotifier {
     }
     notifyListeners();
 
-    // 2. Persistencia transparente en backend (sin re-fetching que revierta el estado)
     try {
       if (estaCompletada) {
         final itemAEliminar = listaOriginal.firstWhere(
@@ -88,8 +84,7 @@ class HistorialProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
-      debugPrint('❌ Error al guardar comida en Supabase: $e');
-      // Revertir únicamente en caso de falla real de red o base de datos
+      debugPrint('Error al guardar comida en Supabase: $e');
       _historialHoy = HistorialDia(
         id: _historialHoy!.id,
         fecha: _historialHoy!.fecha,
@@ -102,13 +97,11 @@ class HistorialProvider extends ChangeNotifier {
     }
   }
 
-  /// Comprueba si el ejercicio está completado
   bool isEjercicioCompletado(String nombreEjercicio) {
     if (_historialHoy == null) return false;
     return _historialHoy!.ejercicios.any((e) => e.nombre == nombreEjercicio);
   }
 
-  /// Alterna ejercicio en la UI de inmediato y persiste en Supabase
   Future<void> toggleEjercicio(HistorialEjercicio ejercicio) async {
     if (_historialHoy == null) return;
 
@@ -117,7 +110,6 @@ class HistorialProvider extends ChangeNotifier {
       _historialHoy!.ejercicios,
     );
 
-    // 1. Actualización optimista inmediata
     if (estaCompletado) {
       _historialHoy!.ejercicios.removeWhere(
         (e) => e.nombre == ejercicio.nombre,
@@ -127,7 +119,6 @@ class HistorialProvider extends ChangeNotifier {
     }
     notifyListeners();
 
-    // 2. Persistencia transparente en backend
     try {
       if (estaCompletado) {
         final itemAEliminar = listaOriginal.firstWhere(
@@ -183,8 +174,28 @@ class HistorialProvider extends ChangeNotifier {
         'comidas_completadas': _historialHoy!.comidas.length,
       };
 
+      int caloriasQuemadasTotales = 0;
+
+      for (var ej in _historialHoy!.ejercicios) {
+        int series = ej.series ?? 3;
+        int repeticiones = ej.repeticiones ?? 10;
+
+        int caloriasPorEjercicio = (series * repeticiones * 1.5).round();
+        if (caloriasPorEjercicio < 25) caloriasPorEjercicio = 45;
+
+        caloriasQuemadasTotales += caloriasPorEjercicio;
+      }
+
+      double grasaQuemadaG = caloriasQuemadasTotales > 0
+          ? (caloriasQuemadasTotales / 7.7)
+          : 0.0;
+
       final infoFisica = {
         'total_ejercicios': _historialHoy!.ejercicios.length,
+        'gasto_calorias_estimado': caloriasQuemadasTotales,
+        'gasto_grasa_estimado_g': double.parse(
+          grasaQuemadaG.toStringAsFixed(1),
+        ),
         'ejercicios_completados': _historialHoy!.ejercicios
             .map((e) => e.nombre)
             .toList(),
