@@ -4,7 +4,6 @@ import '../core/constants/app_constants.dart';
 import '../models/routine_model.dart';
 import '../services/routine_service.dart';
 
-/// Gestor de estado para rutinas de ejercicio (activa, filtros, generación con IA y guardado)
 class RoutineProvider extends ChangeNotifier {
   final RoutineService _routineService = RoutineService();
 
@@ -14,8 +13,7 @@ class RoutineProvider extends ChangeNotifier {
   bool _isSaving = false;
   String? _errorMessage;
 
-  // Estado del flujo de generación
-  int _currentStep = 0; // 0: Formulario, 1: Sugerencias IA
+  int _currentStep = 0;
   List<RoutineSuggestion> _sugerenciasIA = [];
 
   // Parámetros del formulario
@@ -26,7 +24,6 @@ class RoutineProvider extends ChangeNotifier {
   final Set<String> _gruposMuscularesSeleccionados = {'Pecho', 'Espalda'};
   String _observacionesEspeciales = '';
 
-  // Getters
   RoutineModel? get rutinaActiva => _rutinaActiva;
   bool get isLoadingActive => _isLoadingActive;
   bool get isGeneratingAI => _isGeneratingAI;
@@ -46,9 +43,9 @@ class RoutineProvider extends ChangeNotifier {
 
   RoutineProvider() {
     cargarRutinaActiva();
+    cargarTodasLasRutinas();
   }
 
-  /// Carga la rutina activa del usuario desde Supabase
   Future<void> cargarRutinaActiva() async {
     _isLoadingActive = true;
     _errorMessage = null;
@@ -64,13 +61,11 @@ class RoutineProvider extends ChangeNotifier {
     }
   }
 
-  /// Control de pasos (0: Formulario, 1: Sugerencias)
   void setStep(int step) {
     _currentStep = step;
     notifyListeners();
   }
 
-  /// Manejo de selección de días
   void toggleDia(String dia, bool selected) {
     if (selected) {
       _diasSeleccionados.add(dia);
@@ -80,7 +75,6 @@ class RoutineProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Manejo de selección de grupos musculares
   void toggleGrupoMuscular(String grupo, bool selected) {
     if (selected) {
       _gruposMuscularesSeleccionados.add(grupo);
@@ -90,31 +84,26 @@ class RoutineProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Configuración de modalidad
   void setModalidad(String modalidad) {
     _modalidadSeleccionada = modalidad;
     notifyListeners();
   }
 
-  /// Configuración de objetivo
   void setObjetivo(String objetivo) {
     _objetivoSeleccionado = objetivo;
     notifyListeners();
   }
 
-  /// Configuración de nivel de experiencia
   void setNivelExperiencia(String nivel) {
     _nivelExperiencia = nivel;
     notifyListeners();
   }
 
-  /// Configuración de observaciones especiales
   void setObservaciones(String observaciones) {
     _observacionesEspeciales = observaciones;
     notifyListeners();
   }
 
-  /// Genera opciones de rutinas con IA enviando la parametrización completa
   Future<bool> generarRutinasConIA() async {
     if (_diasSeleccionados.isEmpty) {
       _errorMessage = 'Selecciona al menos un día de entrenamiento';
@@ -146,7 +135,6 @@ class RoutineProvider extends ChangeNotifier {
     }
   }
 
-  /// Guarda la rutina seleccionada y actualiza la rutina activa automáticamente
   Future<bool> guardarRutina(RoutineSuggestion rutinaElegida) async {
     _isSaving = true;
     _errorMessage = null;
@@ -175,7 +163,6 @@ class RoutineProvider extends ChangeNotifier {
     }
   }
 
-  /// Elimina la rutina activa del usuario
   Future<bool> eliminarRutina() async {
     if (_rutinaActiva == null) return false;
 
@@ -188,6 +175,26 @@ class RoutineProvider extends ChangeNotifier {
       _errorMessage = 'Error al eliminar rutina: $e';
       notifyListeners();
       return false;
+    }
+  }
+
+  List<RoutineModel> _todasLasRutinas = [];
+  bool _isLoadingList = false;
+
+  List<RoutineModel> get todasLasRutinas => List.unmodifiable(_todasLasRutinas);
+  bool get isLoadingList => _isLoadingList;
+
+  Future<void> cargarTodasLasRutinas() async {
+    _isLoadingList = true;
+    notifyListeners();
+
+    try {
+      _todasLasRutinas = await _routineService.obtenerTodasLasRutinas();
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoadingList = false;
+      notifyListeners();
     }
   }
 }

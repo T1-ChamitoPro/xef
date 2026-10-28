@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/diet_model.dart';
 
 /// Servicio centralizado para gestionar dietas (consultas, guardado, eliminación y generación IA).
@@ -81,7 +83,10 @@ class DietService {
             : response.data;
 
         return dataList
-            .map((m) => DietSuggestion.fromMap(Map<String, dynamic>.from(m as Map)))
+            .map(
+              (m) =>
+                  DietSuggestion.fromMap(Map<String, dynamic>.from(m as Map)),
+            )
             .toList();
       } else {
         throw Exception('Error en el servidor: ${response.status}');
@@ -112,12 +117,29 @@ class DietService {
         menu: {
           for (var dia in dias)
             dia.toUpperCase(): const DietMealDay(
-              desayuno: 'Omelette de 3 claras y 1 huevo entero con pimientos y fruta',
+              desayuno:
+                  'Omelette de 3 claras y 1 huevo entero con pimientos y fruta',
               almuerzo: '200g de carne de res magra, quinua y ensalada verde',
               cena: 'Pechuga desmechada con aguacate y ensalada mixta',
             ),
         },
       ),
     ];
+  }
+
+  /// Obtiene todas las dietas del usuario (ordenadas de más reciente a más antigua)
+  Future<List<DietModel>> obtenerTodasLasDietas() async {
+    final userId = _supabase.auth.currentUser?.id;
+    if (userId == null) return [];
+
+    final data = await _supabase
+        .from('dieta')
+        .select()
+        .eq('usuario_id', userId)
+        .order('id', ascending: false);
+
+    return (data as List)
+        .map((item) => DietModel.fromMap(Map<String, dynamic>.from(item)))
+        .toList();
   }
 }
