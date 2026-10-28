@@ -8,23 +8,6 @@ import '../models/diet_model.dart';
 class DietService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// Obtiene la dieta activa más reciente del usuario
-  Future<DietModel?> obtenerDietaActiva() async {
-    final userId = _supabase.auth.currentUser?.id;
-    if (userId == null) return null;
-
-    final data = await _supabase
-        .from('dieta')
-        .select()
-        .eq('usuario_id', userId)
-        .order('id', ascending: false)
-        .limit(1)
-        .maybeSingle();
-
-    if (data == null) return null;
-    return DietModel.fromMap(data);
-  }
-
   /// Guarda una nueva dieta en Supabase
   Future<void> guardarDieta({
     required String nombre,

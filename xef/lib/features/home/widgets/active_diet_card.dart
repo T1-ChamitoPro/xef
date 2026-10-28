@@ -8,13 +8,13 @@ import '../../../models/historial_model.dart';
 import '../../../providers/historial_provider.dart';
 
 class ActiveDietCard extends StatelessWidget {
-  final DietModel? dietaActiva;
+  final DietModel? dieta;
   final String diaSemana;
   final VoidCallback? onDelete;
 
   const ActiveDietCard({
     super.key,
-    required this.dietaActiva,
+    required this.dieta,
     required this.diaSemana,
     this.onDelete,
   });
@@ -56,7 +56,7 @@ class ActiveDietCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final menuHoy = dietaActiva?.getMenuDelDia(diaSemana);
+    final menuHoy = dieta?.getMenuDelDia(diaSemana);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,8 +64,8 @@ class ActiveDietCard extends StatelessWidget {
         SectionHeader(
           title: 'Dieta de hoy',
           icon: Icons.restaurant_menu_rounded,
-          badgeText: dietaActiva?.nombre,
-          onDelete: dietaActiva != null ? onDelete : null,
+          badgeText: dieta?.nombre,
+          onDelete: dieta != null ? onDelete : null,
         ),
         const SizedBox(height: 12),
         Container(
@@ -78,7 +78,7 @@ class ActiveDietCard extends StatelessWidget {
               color: AppColors.azureMist.withValues(alpha: 0.08),
             ),
           ),
-          child: dietaActiva != null && menuHoy != null
+          child: dieta != null && menuHoy != null
               ? Consumer<HistorialProvider>(
                   builder: (context, historialProvider, _) {
                     return Column(

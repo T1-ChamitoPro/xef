@@ -7,8 +7,6 @@ import '../services/routine_service.dart';
 class RoutineProvider extends ChangeNotifier {
   final RoutineService _routineService = RoutineService();
 
-  RoutineModel? _rutinaActiva;
-  bool _isLoadingActive = false;
   bool _isGeneratingAI = false;
   bool _isSaving = false;
   String? _errorMessage;
@@ -16,7 +14,6 @@ class RoutineProvider extends ChangeNotifier {
   int _currentStep = 0;
   List<RoutineSuggestion> _sugerenciasIA = [];
 
-  // Parámetros del formulario
   final Set<String> _diasSeleccionados = {'LUNES', 'MIERCOLES', 'VIERNES'};
   String _modalidadSeleccionada = AppConstants.modalidadesRutina.first;
   String _objetivoSeleccionado = AppConstants.objetivosRutina.first;
@@ -24,8 +21,6 @@ class RoutineProvider extends ChangeNotifier {
   final Set<String> _gruposMuscularesSeleccionados = {'Pecho', 'Espalda'};
   String _observacionesEspeciales = '';
 
-  RoutineModel? get rutinaActiva => _rutinaActiva;
-  bool get isLoadingActive => _isLoadingActive;
   bool get isGeneratingAI => _isGeneratingAI;
   bool get isSaving => _isSaving;
   String? get errorMessage => _errorMessage;
@@ -42,23 +37,7 @@ class RoutineProvider extends ChangeNotifier {
   String get observacionesEspeciales => _observacionesEspeciales;
 
   RoutineProvider() {
-    cargarRutinaActiva();
     cargarTodasLasRutinas();
-  }
-
-  Future<void> cargarRutinaActiva() async {
-    _isLoadingActive = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      _rutinaActiva = await _routineService.obtenerRutinaActiva();
-    } catch (e) {
-      _errorMessage = e.toString();
-    } finally {
-      _isLoadingActive = false;
-      notifyListeners();
-    }
   }
 
   void setStep(int step) {
@@ -115,6 +94,8 @@ class RoutineProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
+    bool exito = false;
+
     try {
       _sugerenciasIA = await _routineService.generarRutinasConIA(
         dias: _diasSeleccionados.toList(),
@@ -125,14 +106,16 @@ class RoutineProvider extends ChangeNotifier {
         observaciones: _observacionesEspeciales,
       );
       _currentStep = 1;
-      return true;
+      exito = true;
     } catch (e) {
       _errorMessage = 'Error al generar rutinas: $e';
-      return false;
+      exito = false;
     } finally {
       _isGeneratingAI = false;
       notifyListeners();
     }
+
+    return exito;
   }
 
   Future<bool> guardarRutina(RoutineSuggestion rutinaElegida) async {
@@ -151,7 +134,7 @@ class RoutineProvider extends ChangeNotifier {
         ejercicios: rutinaElegida.ejercicios,
       );
 
-      _rutinaActiva = await _routineService.obtenerRutinaActiva();
+      await cargarTodasLasRutinas();
       _currentStep = 0;
       return true;
     } catch (e) {
@@ -160,21 +143,6 @@ class RoutineProvider extends ChangeNotifier {
     } finally {
       _isSaving = false;
       notifyListeners();
-    }
-  }
-
-  Future<bool> eliminarRutina() async {
-    if (_rutinaActiva == null) return false;
-
-    try {
-      await _routineService.eliminarRutina(_rutinaActiva!.id);
-      _rutinaActiva = null;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _errorMessage = 'Error al eliminar rutina: $e';
-      notifyListeners();
-      return false;
     }
   }
 
@@ -201,13 +169,6 @@ class RoutineProvider extends ChangeNotifier {
   RoutineModel? getRutinaParaDia(String dia) {
     final diaUpper = dia.toUpperCase();
 
-    // 1. Preferir la activa si tiene el día
-    if (_rutinaActiva != null &&
-        _rutinaActiva!.diasSemana.any((d) => d.toUpperCase() == diaUpper)) {
-      return _rutinaActiva;
-    }
-
-    // 2. Buscar en todas las rutinas
     try {
       return _todasLasRutinas.firstWhere(
         (r) => r.diasSemana.any((d) => d.toUpperCase() == diaUpper),
@@ -217,15 +178,9 @@ class RoutineProvider extends ChangeNotifier {
     }
   }
 
-  /// Elimina una rutina por su ID (funciona para cualquier rutina, no solo la activa)
   Future<bool> eliminarRutinaPorId(dynamic id) async {
     try {
       await _routineService.eliminarRutina(id);
-
-      if (_rutinaActiva?.id == id) {
-        _rutinaActiva = null;
-      }
-
       _todasLasRutinas.removeWhere((r) => r.id == id);
       notifyListeners();
       return true;
