@@ -30,40 +30,6 @@ class DashboardScreen extends StatelessWidget {
     await context.read<AuthProvider>().cerrarSesion();
   }
 
-  Future<void> _eliminarDieta(BuildContext context) async {
-    final confirmar = await showAppConfirmationDialog(
-      context: context,
-      title: '¿Eliminar dieta activa?',
-      message: 'Esta acción eliminará tu plan nutricional actual. Podrás generar uno nuevo en cualquier momento.',
-    );
-
-    if (confirmar != true || !context.mounted) return;
-
-    final success = await context.read<DietProvider>().eliminarDieta();
-    if (success && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dieta eliminada correctamente')),
-      );
-    }
-  }
-
-  Future<void> _eliminarRutina(BuildContext context) async {
-    final confirmar = await showAppConfirmationDialog(
-      context: context,
-      title: '¿Eliminar rutina activa?',
-      message: 'Esta acción eliminará tu rutina de ejercicios actual. Podrás generar una nueva en cualquier momento.',
-    );
-
-    if (confirmar != true || !context.mounted) return;
-
-    final success = await context.read<RoutineProvider>().eliminarRutina();
-    if (success && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rutina eliminada correctamente')),
-      );
-    }
-  }
-
   Future<void> _registrarDia(BuildContext context) async {
     final historialProvider = context.read<HistorialProvider>();
     await historialProvider.cargarHistorialHoy();
@@ -192,7 +158,6 @@ class DashboardScreen extends StatelessWidget {
                     ActiveDietCard(
                       dietaActiva: dietProvider.getDietaParaDia(diaSemana),
                       diaSemana: diaSemana,
-                      onDelete: () => _eliminarDieta(context),
                     ),
                     const SizedBox(height: 20),
 
@@ -200,7 +165,6 @@ class DashboardScreen extends StatelessWidget {
                     ActiveRoutineCard(
                       rutinaActiva: routineProvider.getRutinaParaDia(diaSemana),
                       diaSemana: diaSemana,
-                      onDelete: () => _eliminarRutina(context),
                     ),
 
                     const SizedBox(height: 12),

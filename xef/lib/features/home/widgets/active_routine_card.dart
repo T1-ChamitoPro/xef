@@ -50,6 +50,7 @@ class ActiveRoutineCard extends StatelessWidget {
           title: 'Rutina de hoy',
           icon: Icons.fitness_center_rounded,
           onDelete: rutinaActiva != null ? onDelete : null,
+          badgeText: rutinaActiva?.nombre,
         ),
         const SizedBox(height: 12),
         Container(
