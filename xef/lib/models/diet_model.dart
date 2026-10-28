@@ -8,9 +8,9 @@ class DietMealDay {
   factory DietMealDay.fromMap(Map<String, dynamic>? map) {
     if (map == null) return const DietMealDay();
     return DietMealDay(
-      desayuno: map['desayuno']?.toString(),
-      almuerzo: map['almuerzo']?.toString(),
-      cena: map['cena']?.toString(),
+      desayuno: map['desayuno']?.toString() ?? map['Desayuno']?.toString(),
+      almuerzo: map['almuerzo']?.toString() ?? map['Almuerzo']?.toString(),
+      cena: map['cena']?.toString() ?? map['Cena']?.toString(),
     );
   }
 
@@ -43,7 +43,7 @@ class DietSuggestion {
     }
 
     return DietSuggestion(
-      titulo: map['titulo']?.toString() ?? 'Plan Alimenticio',
+      titulo: map['titulo']?.toString() ?? 'Plan Nutricional',
       descripcion: map['descripcion']?.toString() ?? '',
       menu: parsedMenu,
     );
@@ -89,7 +89,7 @@ class DietModel {
     return DietModel(
       id: map['id'],
       usuarioId: map['usuario_id']?.toString() ?? '',
-      nombre: map['nombre']?.toString() ?? 'Dieta Activa',
+      nombre: map['nombre']?.toString() ?? 'Dieta del Día',
       diasSemana: List<String>.from(map['dias_semana'] ?? []),
       objetivo: info['objetivo']?.toString() ?? '',
       estiloVida: info['estilo_vida']?.toString() ?? '',
