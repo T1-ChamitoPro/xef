@@ -43,6 +43,7 @@ class DietProvider extends ChangeNotifier {
 
   DietProvider() {
     cargarDietaActiva();
+    cargarTodasLasDietas();
   }
 
   /// Carga la dieta activa del usuario desde Supabase
@@ -205,6 +206,23 @@ class DietProvider extends ChangeNotifier {
     } finally {
       _isLoadingList = false;
       notifyListeners();
+    }
+  }
+
+  DietModel? getDietaParaDia(String dia) {
+    final diaUpper = dia.toUpperCase();
+
+    if (_dietaActiva != null &&
+        _dietaActiva!.diasSemana.any((d) => d.toUpperCase() == diaUpper)) {
+      return _dietaActiva;
+    }
+
+    try {
+      return _todasLasDietas.firstWhere(
+        (d) => d.diasSemana.any((ds) => ds.toUpperCase() == diaUpper),
+      );
+    } catch (_) {
+      return null;
     }
   }
 }

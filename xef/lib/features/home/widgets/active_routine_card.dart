@@ -147,7 +147,7 @@ class ActiveRoutineCard extends StatelessWidget {
                       ),
                       SizedBox(width: 10),
                       Text(
-                        'No tienes una rutina activa o programada.',
+                        'No tienes una rutina para hoy.',
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14,

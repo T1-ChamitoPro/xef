@@ -197,4 +197,23 @@ class RoutineProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  RoutineModel? getRutinaParaDia(String dia) {
+    final diaUpper = dia.toUpperCase();
+
+    // 1. Preferir la activa si tiene el día
+    if (_rutinaActiva != null &&
+        _rutinaActiva!.diasSemana.any((d) => d.toUpperCase() == diaUpper)) {
+      return _rutinaActiva;
+    }
+
+    // 2. Buscar en todas las rutinas
+    try {
+      return _todasLasRutinas.firstWhere(
+        (r) => r.diasSemana.any((d) => d.toUpperCase() == diaUpper),
+      );
+    } catch (_) {
+      return null;
+    }
+  }
 }
