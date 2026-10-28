@@ -14,15 +14,18 @@ class RoutineSuggestion {
     final parsed = <String, List<String>>{};
 
     for (final entry in rawEjercicios.entries) {
+      final keyUpper = entry.key.toString().toUpperCase();
       if (entry.value is List) {
-        parsed[entry.key.toString().toUpperCase()] = List<String>.from(
+        parsed[keyUpper] = List<String>.from(
           (entry.value as List).map((e) => e.toString()),
         );
+      } else if (entry.value is String) {
+        parsed[keyUpper] = [entry.value.toString()];
       }
     }
 
     return RoutineSuggestion(
-      titulo: map['titulo']?.toString() ?? 'Rutina de Entrenamiento',
+      titulo: map['titulo']?.toString() ?? 'Rutina Personalizada',
       descripcion: map['descripcion']?.toString() ?? '',
       ejercicios: parsed,
     );
@@ -58,17 +61,20 @@ class RoutineModel {
     final parsed = <String, List<String>>{};
 
     for (final entry in rawEjercicios.entries) {
+      final keyUpper = entry.key.toString().toUpperCase();
       if (entry.value is List) {
-        parsed[entry.key.toString().toUpperCase()] = List<String>.from(
+        parsed[keyUpper] = List<String>.from(
           (entry.value as List).map((e) => e.toString()),
         );
+      } else if (entry.value is String) {
+        parsed[keyUpper] = [entry.value.toString()];
       }
     }
 
     return RoutineModel(
       id: map['id'],
       usuarioId: map['usuario_id']?.toString() ?? '',
-      nombre: map['nombre']?.toString() ?? 'Rutina Activa',
+      nombre: map['nombre']?.toString() ?? 'Rutina de Entrenamiento',
       diasSemana: List<String>.from(map['dias_semana'] ?? []),
       tiempoEstimadoMin: (map['tiempo_estimado_min'] as num?)?.toInt() ?? 40,
       modalidad: info['modalidad']?.toString() ?? '',
